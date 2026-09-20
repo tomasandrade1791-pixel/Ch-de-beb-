@@ -30,9 +30,17 @@ window.AliceDB = null;
   function fixEnvelopeStage(){
     const tap = document.getElementById('tapText');
     const card = document.getElementById('envCard');
+    const closed = document.getElementById('envClosed');
 
-    // A cartinha fechada e a frase original NÃO são alteradas aqui.
-    // A frase só é escondida depois que o usuário clica para abrir.
+    // SOMENTE nesta etapa: restaurar a cartinha fechada original.
+    // A frase também fica exatamente como antes, até o usuário clicar.
+    if(closed){
+      closed.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
+      closed.alt = 'Cartinha fechada';
+      closed.style.display = 'block';
+      closed.style.opacity = '';
+      closed.style.transform = '';
+    }
     if(tap){
       if(card && card.dataset.realOpened){
         tap.style.display = 'none';
@@ -52,7 +60,6 @@ window.AliceDB = null;
     if(open){
       open.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
       open.alt = 'Cartinha aberta';
-      open.style.display = 'block';
     }
   }
 
