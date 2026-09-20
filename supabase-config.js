@@ -63,12 +63,9 @@ window.AliceDB = null;
     card.dataset.openAnimationReady='1';
     const style=document.createElement('style');
     style.textContent=`
-      #envCard:not(.realOpening) #envClosed{display:block!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:2!important}
-      #envCard:not(.realOpening) #envOpen{display:block!important;opacity:0!important;visibility:hidden!important;z-index:1!important}
-      .envCard.realOpening{overflow:visible}
-      .envCard.realOpening #envClosed{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-      .envCard.realOpening #envOpen{display:block!important;visibility:visible!important;opacity:1!important;z-index:3!important;animation:envelopeOpenIn 1.55s cubic-bezier(.2,.75,.2,1) forwards!important}
-      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;height:0!important;margin:0!important}
+      #envCard.realOpening #envClosed{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;width:0!important;height:0!important}
+      #envCard.realOpening #envOpen{display:block!important;visibility:visible!important;opacity:1!important;z-index:3!important;animation:envelopeOpenIn 1.55s cubic-bezier(.2,.75,.2,1) forwards!important}
+      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;height:0!important;margin:0!important;overflow:hidden!important}
       @keyframes envelopeOpenIn{
         0%{clip-path:inset(100% 0 0 0);opacity:0;transform:translateY(8%) scale(.92)}
         18%{clip-path:inset(82% 0 0 0);opacity:1;transform:translateY(6%) scale(.94)}
@@ -83,19 +80,27 @@ window.AliceDB = null;
       e.preventDefault();
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
-      closed.style.setProperty('display','none','important');
-      closed.style.setProperty('visibility','hidden','important');
-      closed.style.setProperty('opacity','0','important');
+
+      // Remove fisicamente a cartinha fechada. Ela não fica por baixo da aberta.
+      closed.remove();
+
+      // Esconde completamente a frase.
       tap.style.setProperty('display','none','important');
       tap.style.setProperty('opacity','0','important');
       tap.style.setProperty('visibility','hidden','important');
       tap.style.setProperty('pointer-events','none','important');
-      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
-      open.alt='';
+      tap.textContent='';
+
+      // A partir daqui existe somente a imagem da cartinha aberta.
+      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260923';
+      open.alt='Cartinha aberta';
       open.style.setProperty('display','block','important');
       open.style.setProperty('visibility','visible','important');
+      open.style.setProperty('opacity','1','important');
       open.style.setProperty('z-index','3','important');
       card.classList.add('realOpening');
+
+      // Depois da animação, vai direto para as regras. A cartinha aberta não volta.
       setTimeout(function(){ if(typeof show==='function') show('rules'); },3200);
     },true);
   }
