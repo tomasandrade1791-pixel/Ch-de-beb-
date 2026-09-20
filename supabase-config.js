@@ -38,16 +38,11 @@ window.AliceDB = null;
     }
     const tap = document.getElementById('tapText');
     if(tap){
-      tap.textContent = 'TOQUE NA CARTINHA PARA ABRIR';
-      if(card && card.dataset.realOpened){
-        tap.style.display = 'none';
-        tap.style.opacity = '0';
-        tap.style.visibility = 'hidden';
-      }else{
-        tap.style.display = 'block';
-        tap.style.opacity = '1';
-        tap.style.visibility = 'visible';
-      }
+      tap.textContent = '';
+      tap.style.display = 'none';
+      tap.style.opacity = '0';
+      tap.style.visibility = 'hidden';
+      tap.style.pointerEvents = 'none';
     }
     const open = document.getElementById('envOpen');
     if(open){
@@ -69,11 +64,9 @@ window.AliceDB = null;
       .envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
-      .envCard.realOpening + .tap{animation:tapOut .28s ease forwards}
-      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+      .envCard + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}45%{opacity:1;transform:scale(1.018) rotate(-.25deg)}100%{opacity:0;transform:scale(1.045) rotate(-.7deg)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94);filter:drop-shadow(0 0 0 rgba(215,184,106,0))}35%{clip-path:inset(62% 0 0 0);opacity:1;transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);opacity:1;transform:translateY(.5%) scale(.992);filter:drop-shadow(0 0 20px rgba(215,184,106,.18))}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 30px rgba(215,184,106,.35))}}
-      @keyframes tapOut{to{opacity:0;visibility:hidden}}
     `;
     document.head.appendChild(style);
     card.addEventListener('click',function(e){
@@ -81,10 +74,7 @@ window.AliceDB = null;
       e.preventDefault();
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
-      tap.style.pointerEvents='none';
-      tap.style.display='none';
-      tap.style.opacity='0';
-      tap.style.visibility='hidden';
+      if(tap){tap.style.display='none';tap.style.opacity='0';tap.style.visibility='hidden';tap.style.pointerEvents='none';}
       card.classList.add('realOpening');
       setTimeout(function(){
         if(typeof show==='function') show('rules');
