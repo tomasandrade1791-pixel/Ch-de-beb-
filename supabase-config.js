@@ -46,20 +46,59 @@ window.AliceDB = null;
       tap.style.opacity = '1';
     }
 
-    // Não força uma imagem aberta inexistente. A imagem aberta será ligada
-    // quando o arquivo correspondente estiver no repositório.
+    // A imagem aberta agora é o arquivo adicionado pelo usuário.
     const open = document.getElementById('envOpen');
     if(open){
-      open.style.display = 'none';
-      open.removeAttribute('src');
+      open.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
+      open.alt = 'Cartinha aberta';
+      open.style.display = 'block';
     }
+  }
+
+  function initEnvelopeAnimation(){
+    const card = document.getElementById('envCard');
+    const closed = document.getElementById('envClosed');
+    const open = document.getElementById('envOpen');
+    const tap = document.getElementById('tapText');
+    if(!card || !closed || !open || card.dataset.openAnimationReady) return;
+    card.dataset.openAnimationReady='1';
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .envCard.realOpening{overflow:visible}
+      .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
+      .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
+      .envCard.realOpening + .tap{animation:tapOut .28s ease forwards}
+      @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}55%{opacity:.95;transform:scale(1.025) rotate(-.4deg)}100%{opacity:0;transform:scale(1.055) rotate(-1deg)}}
+      @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94);filter:drop-shadow(0 0 0 rgba(215,184,106,0))}45%{clip-path:inset(35% 0 0 0);opacity:1;transform:translateY(1%) scale(.985);filter:drop-shadow(0 0 20px rgba(215,184,106,.18))}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 30px rgba(215,184,106,.35))}}
+      @keyframes tapOut{to{opacity:0;visibility:hidden}}
+    `;
+    document.head.appendChild(style);
+
+    // Captura o toque antes do listener antigo do index.html, sem alterar a etapa da Alice.
+    card.addEventListener('click',function(e){
+      if(card.dataset.realOpened) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      card.dataset.realOpened='1';
+      tap.style.pointerEvents='none';
+      card.classList.add('realOpening');
+      setTimeout(function(){
+        if(typeof show==='function') show('paperReveal');
+      },1450);
+      setTimeout(function(){
+        if(typeof show==='function') show('rules');
+      },2950);
+    },true);
   }
 
   function init(){
     fixAliceStage();
     fixEnvelopeStage();
+    initEnvelopeAnimation();
     setTimeout(fixEnvelopeStage,500);
     setTimeout(fixEnvelopeStage,1500);
+    setTimeout(initEnvelopeAnimation,50);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init);
   else init();
