@@ -31,7 +31,7 @@ window.AliceDB = null;
       }
       .aliceLogo .aliceWord{
         font-family:"Brush Script MT","Segoe Script","Snell Roundhand","URW Chancery L",cursive;
-        font-size:clamp(92px,16vw,190px);
+        font-size:clamp(105px,18vw,210px);
         font-weight:500;
         letter-spacing:-.075em;
         transform:scaleX(.92);
@@ -39,7 +39,7 @@ window.AliceDB = null;
       }
       .aliceLogo .aliceStar{
         font-family:Georgia,serif;
-        font-size:clamp(62px,10vw,120px);
+        font-size:clamp(70px,11vw,130px);
         line-height:.75;
         margin-left:-4px;
         margin-bottom:4px;
@@ -52,8 +52,8 @@ window.AliceDB = null;
         100%{opacity:1;transform:scale(1)}
       }
       @media(max-width:650px){
-        .aliceLogo .aliceWord{font-size:clamp(78px,22vw,145px)}
-        .aliceLogo .aliceStar{font-size:clamp(54px,13vw,92px);margin-left:-2px}
+        .aliceLogo .aliceWord{font-size:clamp(92px,25vw,170px)}
+        .aliceLogo .aliceStar{font-size:clamp(60px,14vw,100px);margin-left:-2px}
       }
     `;
     document.head.appendChild(style);
