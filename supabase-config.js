@@ -64,6 +64,19 @@ window.AliceDB = null;
     logo.innerHTML = '<span class="aliceWord">Alice</span><span class="aliceStar">★</span>';
     stage.appendChild(logo);
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',fixAliceStage);
-  else fixAliceStage();
+
+  function fixEnvelopeImage(){
+    const closed = document.getElementById('envClosed');
+    const open = document.getElementById('envOpen');
+    const url = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
+    if(closed) closed.src = url;
+    if(open) open.src = url;
+  }
+
+  function init(){
+    fixAliceStage();
+    fixEnvelopeImage();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
 })();
