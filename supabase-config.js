@@ -32,6 +32,7 @@ window.AliceDB = null;
   function fixEnvelopeStage(){
     const url = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
     const closed = document.getElementById('envClosed');
+    const card = document.getElementById('envCard');
     if(closed){
       closed.src = url;
       closed.alt = 'Cartinha fechada';
@@ -41,8 +42,13 @@ window.AliceDB = null;
     const tap = document.getElementById('tapText');
     if(tap){
       tap.textContent = 'TOQUE NA CARTINHA PARA ABRIR';
-      tap.style.display = 'block';
-      tap.style.opacity = '1';
+      if(card && card.dataset.realOpened){
+        tap.style.display = 'none';
+        tap.style.opacity = '0';
+      }else{
+        tap.style.display = 'block';
+        tap.style.opacity = '1';
+      }
     }
 
     const open = document.getElementById('envOpen');
@@ -81,6 +87,8 @@ window.AliceDB = null;
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
       tap.style.pointerEvents='none';
+      tap.style.display='none';
+      tap.style.opacity='0';
       card.classList.add('realOpening');
 
       setTimeout(function(){
