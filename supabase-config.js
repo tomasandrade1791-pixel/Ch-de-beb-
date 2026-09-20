@@ -29,53 +29,37 @@ window.AliceDB = null;
     stage.appendChild(logo);
   }
 
-  function fixEnvelopeAnimation(){
-    const card = document.getElementById('envCard');
+  function fixEnvelopeStage(){
+    const url = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
     const closed = document.getElementById('envClosed');
-    const open = document.getElementById('envOpen');
+    if(closed){
+      closed.src = url;
+      closed.alt = 'Cartinha fechada';
+      closed.style.display = 'block';
+    }
+
+    // Mantém a frase original abaixo da cartinha.
     const tap = document.getElementById('tapText');
-    if(!card || !closed || !open || card.dataset.envelopeFixed) return;
-    card.dataset.envelopeFixed = '1';
+    if(tap){
+      tap.textContent = 'TOQUE NA CARTINHA PARA ABRIR';
+      tap.style.display = 'block';
+      tap.style.opacity = '1';
+    }
 
-    const closedUrl = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260921';
-    const openUrl = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/cartinha-abertura.svg?v=20260921';
-
-    closed.src = closedUrl;
-    closed.alt = 'Cartinha fechada';
-    open.src = openUrl;
-    open.alt = 'Cartinha aberta';
-
-    if(tap) tap.style.display = 'none';
-
-    card.style.cursor = 'pointer';
-    card.setAttribute('role','button');
-    card.setAttribute('aria-label','Abrir cartinha');
-
-    const style = document.createElement('style');
-    style.textContent = `
-      #envCard{perspective:1100px;min-height:58vh;cursor:pointer}
-      #envCard img{backface-visibility:hidden;transform-origin:center center;transition:none}
-      #envClosed{opacity:1!important;transform:scale(1) rotateX(0deg);z-index:2;animation:none}
-      #envOpen{opacity:0!important;transform:scale(.94) rotateX(-90deg);z-index:1;animation:none}
-      #envCard.envelopeOpening #envClosed{animation:envelopeClose 1.15s cubic-bezier(.65,0,.35,1) forwards}
-      #envCard.envelopeOpening #envOpen{animation:envelopeOpen 1.15s cubic-bezier(.65,0,.35,1) .72s forwards}
-      @keyframes envelopeClose{0%{opacity:1;transform:scale(1) rotateX(0deg)}55%{opacity:1;transform:scale(1.02) rotateX(90deg)}100%{opacity:0;transform:scale(.98) rotateX(90deg)}}
-      @keyframes envelopeOpen{0%{opacity:0;transform:scale(.94) rotateX(-90deg)}45%{opacity:1}100%{opacity:1;transform:scale(1) rotateX(0deg)}}
-    `;
-    document.head.appendChild(style);
-
-    card.addEventListener('click',function(){
-      if(card.classList.contains('envelopeOpening')) return;
-      card.classList.add('envelopeOpening');
-      setTimeout(function(){
-        if(typeof show === 'function') show('paperReveal');
-      },2100);
-    });
+    // Não força uma imagem aberta inexistente. A imagem aberta será ligada
+    // quando o arquivo correspondente estiver no repositório.
+    const open = document.getElementById('envOpen');
+    if(open){
+      open.style.display = 'none';
+      open.removeAttribute('src');
+    }
   }
 
   function init(){
     fixAliceStage();
-    fixEnvelopeAnimation();
+    fixEnvelopeStage();
+    setTimeout(fixEnvelopeStage,500);
+    setTimeout(fixEnvelopeStage,1500);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init);
   else init();
