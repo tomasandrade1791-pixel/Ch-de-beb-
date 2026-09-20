@@ -89,10 +89,66 @@ window.AliceDB = null;
     },true);
   }
 
+  function initRulesIntroSplit(){
+    let tries=0;
+    const timer=setInterval(function(){
+      tries++;
+      if(typeof window.renderRule !== 'function' || !document.getElementById('rp')){
+        if(tries>100) clearInterval(timer);
+        return;
+      }
+      clearInterval(timer);
+
+      const baseRenderRule=window.renderRule;
+      const baseNext=window.next;
+      const basePrev=window.prev;
+      let intro=true;
+
+      window.renderRule=function(){
+        const rp=document.getElementById('rp');
+        if(!rp) return;
+
+        if(intro){
+          rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1>'+
+            '<p class="intro"><strong>Queridos amigos e familiares,</strong><br>'+
+            'Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>'+
+            'Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p>'+
+            '<div class="nav"><button class="btn" disabled>‹ VOLTAR</button><span class="counter">INTRODUÇÃO</span><button class="btn" onclick="next()">COMEÇAR ›</button></div>';
+        }else{
+          baseRenderRule();
+        }
+      };
+
+      window.next=function(){
+        if(intro){
+          intro=false;
+          ri=0;
+          window.renderRule();
+        }else{
+          baseNext();
+        }
+      };
+
+      window.prev=function(){
+        if(!intro && ri===0){
+          intro=true;
+          window.renderRule();
+        }else if(!intro){
+          basePrev();
+        }
+      };
+
+      intro=true;
+      ri=0;
+      window.renderRule();
+    },100);
+  }
+
   function init(){
     fixAliceStage();
     fixEnvelopeStage();
     initEnvelopeAnimation();
+    initRulesIntroSplit();
     setTimeout(fixEnvelopeStage,500);
     setTimeout(fixEnvelopeStage,1500);
     setTimeout(initEnvelopeAnimation,50);
