@@ -4,97 +4,84 @@ window.AliceDB = null;
 
 (function(){
   function fixAliceStage(){
-    const stage = document.querySelector('.aliceStage');
-    const old = document.querySelector('.aliceArt');
+    const stage=document.querySelector('.aliceStage');
+    const old=document.querySelector('.aliceArt');
     if(!stage || stage.dataset.aliceFixed) return;
-    stage.dataset.aliceFixed = '1';
-    if(old) old.style.display = 'none';
-    const sub = stage.querySelector('.sub');
-    if(sub) sub.style.display = 'none';
-    const style = document.createElement('style');
-    style.textContent = `
-      .aliceLogo{position:relative;z-index:4;display:flex;align-items:flex-end;justify-content:center;gap:0;color:#2f61b8;line-height:.8;white-space:nowrap;filter:drop-shadow(0 0 5px rgba(38,88,170,.38)) drop-shadow(0 0 18px rgba(8,36,74,.32));animation:aliceLogoReveal 5.2s ease-in-out both;user-select:none}
-      .aliceLogo .aliceWord{font-family:"Brush Script MT","Segoe Script","Snell Roundhand","URW Chancery L",cursive;font-size:clamp(105px,18vw,210px);font-weight:500;letter-spacing:-.075em;transform:scaleX(.92);transform-origin:right center}
+    stage.dataset.aliceFixed='1';
+    if(old) old.style.display='none';
+    const sub=stage.querySelector('.sub');
+    if(sub) sub.style.display='none';
+    const style=document.createElement('style');
+    style.textContent=`
+      .aliceLogo{position:relative;z-index:4;display:flex;align-items:flex-end;justify-content:center;color:#2f61b8;line-height:.8;white-space:nowrap;filter:drop-shadow(0 0 5px rgba(38,88,170,.38)) drop-shadow(0 0 18px rgba(8,36,74,.32));animation:aliceLogoReveal 5.2s ease-in-out both;user-select:none}
+      .aliceLogo .aliceWord{font-family:"Brush Script MT","Segoe Script","Snell Roundhand","URW Chancery L",cursive;font-size:clamp(105px,18vw,210px);font-weight:500;letter-spacing:-.075em;transform:scaleX(.92)}
       .aliceLogo .aliceStar{font-family:Georgia,serif;font-size:clamp(70px,11vw,130px);line-height:.75;margin-left:-4px;margin-bottom:4px;transform:rotate(-8deg)}
-      @keyframes aliceLogoReveal{0%{opacity:0;transform:scale(.82);filter:blur(8px) drop-shadow(0 0 0 transparent)}28%{opacity:.18;transform:scale(.9)}60%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 0 7px rgba(38,88,170,.45)) drop-shadow(0 0 20px rgba(215,184,106,.3))}100%{opacity:1;transform:scale(1)}}
-      @media(max-width:650px){.aliceLogo .aliceWord{font-size:clamp(92px,25vw,170px)}.aliceLogo .aliceStar{font-size:clamp(60px,14vw,100px);margin-left:-2px}}
+      @keyframes aliceLogoReveal{0%{opacity:0;transform:scale(.82);filter:blur(8px)}60%{opacity:1;transform:scale(1);filter:blur(0)}}
     `;
     document.head.appendChild(style);
-    const logo = document.createElement('div');
-    logo.className = 'aliceLogo';
+    const logo=document.createElement('div');
+    logo.className='aliceLogo';
     logo.setAttribute('aria-label','Alice');
-    logo.innerHTML = '<span class="aliceWord">Alice</span><span class="aliceStar">★</span>';
+    logo.innerHTML='<span class="aliceWord">Alice</span><span class="aliceStar">★</span>';
     stage.appendChild(logo);
   }
 
-  function fixEnvelopeStage(){
-    const tap = document.getElementById('tapText');
-    const card = document.getElementById('envCard');
-    const closed = document.getElementById('envClosed');
+  // RESTAURA SOMENTE A CARTINHA FECHADA.
+  // Nesta fase ela deve aparecer com a frase original. Nenhuma outra parte é alterada.
+  function restoreClosedEnvelope(){
+    const card=document.getElementById('envCard');
+    const closed=document.getElementById('envClosed');
+    const tap=document.getElementById('tapText');
+    if(!card || !closed || !tap) return;
 
-    // SOMENTE nesta etapa: restaurar a cartinha fechada original.
-    // A frase também fica exatamente como antes, até o usuário clicar.
-    if(closed){
-      closed.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
-      closed.alt = 'Cartinha fechada';
-      closed.style.display = 'block';
-      closed.style.opacity = '';
-      closed.style.transform = '';
-    }
-    if(tap){
-      if(card && card.dataset.realOpened){
-        tap.style.display = 'none';
-        tap.style.opacity = '0';
-        tap.style.visibility = 'hidden';
-        tap.style.pointerEvents = 'none';
-      }else{
-        tap.textContent = 'TOQUE NA CARTINHA PARA ABRIR';
-        tap.style.display = 'block';
-        tap.style.opacity = '1';
-        tap.style.visibility = 'visible';
-        tap.style.pointerEvents = 'auto';
-      }
-    }
-
-    const open = document.getElementById('envOpen');
-    if(open){
-      open.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
-      open.alt = 'Cartinha aberta';
+    // Só restauramos a aparência inicial se a cartinha ainda não foi clicada.
+    if(!card.dataset.realOpened){
+      closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260922';
+      closed.alt='Cartinha fechada';
+      closed.style.setProperty('display','block','important');
+      closed.style.setProperty('opacity','1','important');
+      closed.style.setProperty('visibility','visible','important');
+      closed.style.setProperty('transform','none','important');
+      closed.style.setProperty('z-index','2','important');
+      tap.textContent='TOQUE NA CARTINHA PARA ABRIR';
+      tap.style.setProperty('display','block','important');
+      tap.style.setProperty('opacity','1','important');
+      tap.style.setProperty('visibility','visible','important');
+      tap.style.setProperty('pointer-events','auto','important');
     }
   }
 
   function initEnvelopeAnimation(){
-    const card = document.getElementById('envCard');
-    const closed = document.getElementById('envClosed');
-    const open = document.getElementById('envOpen');
-    const tap = document.getElementById('tapText');
-    if(!card || !closed || !open || card.dataset.openAnimationReady) return;
+    const card=document.getElementById('envCard');
+    const closed=document.getElementById('envClosed');
+    const open=document.getElementById('envOpen');
+    const tap=document.getElementById('tapText');
+    if(!card || !closed || !open || !tap || card.dataset.openAnimationReady) return;
     card.dataset.openAnimationReady='1';
-    const style = document.createElement('style');
-    style.textContent = `
-      .envCard.realOpening{overflow:visible}
+    const style=document.createElement('style');
+    style.textContent=`
+      /* Estado inicial: cartinha fechada intacta. */
+      #envCard:not(.realOpening) #envClosed{display:block!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:2!important}
+      #envCard:not(.realOpening) #envOpen{opacity:0!important;visibility:hidden!important;z-index:1!important}
+      #envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
-      .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
+      .envCard.realOpening #envOpen{visibility:visible!important;animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;z-index:3!important}
       .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-      @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}45%{opacity:1;transform:scale(1.018) rotate(-.25deg)}100%{opacity:0;transform:scale(1.045) rotate(-.7deg)}}
-      @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94);filter:drop-shadow(0 0 0 rgba(215,184,106,0))}35%{clip-path:inset(62% 0 0 0);opacity:1;transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);opacity:1;transform:translateY(.5%) scale(.992);filter:drop-shadow(0 0 20px rgba(215,184,106,.18))}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 30px rgba(215,184,106,.35))}}
+      @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.045)}}
+      @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}35%{clip-path:inset(62% 0 0 0);transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);transform:translateY(.5%) scale(.992)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
     `;
     document.head.appendChild(style);
+
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
-      if(tap){
-        tap.style.display='none';
-        tap.style.opacity='0';
-        tap.style.visibility='hidden';
-        tap.style.pointerEvents='none';
-      }
+      tap.style.setProperty('display','none','important');
+      tap.style.setProperty('opacity','0','important');
+      tap.style.setProperty('visibility','hidden','important');
       card.classList.add('realOpening');
-      setTimeout(function(){
-        if(typeof show==='function') show('rules');
-      },3200);
+      setTimeout(function(){ if(typeof show==='function') show('rules'); },3200);
     },true);
   }
 
@@ -102,47 +89,31 @@ window.AliceDB = null;
     let tries=0;
     const timer=setInterval(function(){
       tries++;
-      if(typeof window.renderRule !== 'function' || !document.getElementById('rp')){
-        if(tries>100) clearInterval(timer);
-        return;
-      }
+      if(typeof window.renderRule!=='function' || !document.getElementById('rp')){if(tries>100)clearInterval(timer);return;}
       clearInterval(timer);
       const baseRenderRule=window.renderRule;
       const baseNext=window.next;
       const basePrev=window.prev;
       let intro=true;
       window.renderRule=function(){
-        const rp=document.getElementById('rp');
-        if(!rp) return;
+        const rp=document.getElementById('rp'); if(!rp)return;
         if(intro){
-          rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1>'+
-            '<p class="intro"><strong>Queridos amigos e familiares,</strong><br>'+
-            'Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>'+
-            'Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p>'+
-            '<div class="nav"><button class="btn" disabled>‹ VOLTAR</button><span class="counter">INTRODUÇÃO</span><button class="btn" onclick="next()">COMEÇAR ›</button></div>';
-        }else{
-          baseRenderRule();
-        }
+          rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p><div class="nav"><button class="btn" disabled>‹ VOLTAR</button><span class="counter">INTRODUÇÃO</span><button class="btn" onclick="next()">COMEÇAR ›</button></div>';
+        }else baseRenderRule();
       };
-      window.next=function(){
-        if(intro){intro=false;ri=0;window.renderRule();}else{baseNext();}
-      };
-      window.prev=function(){
-        if(!intro && ri===0){intro=true;window.renderRule();}else if(!intro){basePrev();}
-      };
+      window.next=function(){if(intro){intro=false;ri=0;window.renderRule();}else baseNext();};
+      window.prev=function(){if(!intro&&ri===0){intro=true;window.renderRule();}else if(!intro)basePrev();};
       intro=true;ri=0;window.renderRule();
     },100);
   }
 
   function init(){
     fixAliceStage();
-    fixEnvelopeStage();
+    restoreClosedEnvelope();
     initEnvelopeAnimation();
     initRulesIntroSplit();
-    setTimeout(fixEnvelopeStage,500);
-    setTimeout(fixEnvelopeStage,1500);
-    setTimeout(initEnvelopeAnimation,50);
+    setTimeout(restoreClosedEnvelope,300);
+    setTimeout(restoreClosedEnvelope,1000);
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init);
-  else init();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
