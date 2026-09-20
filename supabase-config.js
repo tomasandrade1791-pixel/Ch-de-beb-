@@ -33,15 +33,15 @@ window.AliceDB = null;
     const tap=document.getElementById('tapText');
     if(!card || !closed || !open || !tap) return;
     if(!card.dataset.realOpened){
-      closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260922';
+      closed.src='IMG-20260919-WA0104.jpg?v=20260923';
       closed.alt='Cartinha fechada';
       closed.style.setProperty('display','block','important');
       closed.style.setProperty('opacity','1','important');
       closed.style.setProperty('visibility','visible','important');
       closed.style.setProperty('transform','none','important');
       closed.style.setProperty('z-index','2','important');
-      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
-      open.alt='';
+      open.src='file_000000000fbc820ebc60435059877b79.png?v=20260923';
+      open.alt='Cartinha aberta';
       open.style.setProperty('display','block','important');
       open.style.setProperty('opacity','0','important');
       open.style.setProperty('visibility','hidden','important');
@@ -80,27 +80,19 @@ window.AliceDB = null;
       e.preventDefault();
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
-
-      // Remove fisicamente a cartinha fechada. Ela não fica por baixo da aberta.
       closed.remove();
-
-      // Esconde completamente a frase.
       tap.style.setProperty('display','none','important');
       tap.style.setProperty('opacity','0','important');
       tap.style.setProperty('visibility','hidden','important');
       tap.style.setProperty('pointer-events','none','important');
       tap.textContent='';
-
-      // A partir daqui existe somente a imagem da cartinha aberta.
-      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260923';
+      open.src='file_000000000fbc820ebc60435059877b79.png?v=20260923';
       open.alt='Cartinha aberta';
       open.style.setProperty('display','block','important');
       open.style.setProperty('visibility','visible','important');
       open.style.setProperty('opacity','1','important');
       open.style.setProperty('z-index','3','important');
       card.classList.add('realOpening');
-
-      // Depois da animação, vai direto para as regras. A cartinha aberta não volta.
       setTimeout(function(){ if(typeof show==='function') show('rules'); },3200);
     },true);
   }
