@@ -54,6 +54,9 @@ window.AliceDB = null;
     const tap=document.getElementById('tapText');
     if(!card || !closed || !open || !tap || card.dataset.openAnimationReady) return;
     card.dataset.openAnimationReady='1';
+    // A imagem adicionada para a cartinha aberta é esta PNG. A cartinha fechada continua sendo a IMG-20260919-WA0104.jpg.
+    open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260922';
+    open.alt='Cartinha aberta';
     const style=document.createElement('style');
     style.textContent=`
       #envCard:not(.realOpening) #envClosed{display:block!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:2!important}
@@ -62,7 +65,6 @@ window.AliceDB = null;
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{visibility:visible!important;animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;z-index:3!important}
       .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-      /* Somente a área do texto abaixo da cartinha aberta fica preta. */
       .envCard.realOpening + .tap{color:#000!important;text-shadow:none!important}
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.045)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}35%{clip-path:inset(62% 0 0 0);transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);transform:translateY(.5%) scale(.992)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
