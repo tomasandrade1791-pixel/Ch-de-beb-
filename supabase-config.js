@@ -26,15 +26,11 @@ window.AliceDB = null;
     stage.appendChild(logo);
   }
 
-  // RESTAURA SOMENTE A CARTINHA FECHADA.
-  // Nesta fase ela deve aparecer com a frase original. Nenhuma outra parte é alterada.
   function restoreClosedEnvelope(){
     const card=document.getElementById('envCard');
     const closed=document.getElementById('envClosed');
     const tap=document.getElementById('tapText');
     if(!card || !closed || !tap) return;
-
-    // Só restauramos a aparência inicial se a cartinha ainda não foi clicada.
     if(!card.dataset.realOpened){
       closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260922';
       closed.alt='Cartinha fechada';
@@ -60,18 +56,18 @@ window.AliceDB = null;
     card.dataset.openAnimationReady='1';
     const style=document.createElement('style');
     style.textContent=`
-      /* Estado inicial: cartinha fechada intacta. */
       #envCard:not(.realOpening) #envClosed{display:block!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:2!important}
       #envCard:not(.realOpening) #envOpen{opacity:0!important;visibility:hidden!important;z-index:1!important}
-      #envCard.realOpening{overflow:visible}
+      .envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{visibility:visible!important;animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;z-index:3!important}
       .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+      /* Somente a área do texto abaixo da cartinha aberta fica preta. */
+      .envCard.realOpening + .tap{color:#000!important;text-shadow:none!important}
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.045)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}35%{clip-path:inset(62% 0 0 0);transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);transform:translateY(.5%) scale(.992)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
     `;
     document.head.appendChild(style);
-
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened) return;
       e.preventDefault();
