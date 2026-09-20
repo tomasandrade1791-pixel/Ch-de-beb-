@@ -29,8 +29,9 @@ window.AliceDB = null;
   function restoreClosedEnvelope(){
     const card=document.getElementById('envCard');
     const closed=document.getElementById('envClosed');
+    const open=document.getElementById('envOpen');
     const tap=document.getElementById('tapText');
-    if(!card || !closed || !tap) return;
+    if(!card || !closed || !open || !tap) return;
     if(!card.dataset.realOpened){
       closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260922';
       closed.alt='Cartinha fechada';
@@ -39,6 +40,12 @@ window.AliceDB = null;
       closed.style.setProperty('visibility','visible','important');
       closed.style.setProperty('transform','none','important');
       closed.style.setProperty('z-index','2','important');
+      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
+      open.alt='';
+      open.style.setProperty('display','block','important');
+      open.style.setProperty('opacity','0','important');
+      open.style.setProperty('visibility','hidden','important');
+      open.style.setProperty('z-index','1','important');
       tap.textContent='TOQUE NA CARTINHA PARA ABRIR';
       tap.style.setProperty('display','block','important');
       tap.style.setProperty('opacity','1','important');
@@ -54,20 +61,21 @@ window.AliceDB = null;
     const tap=document.getElementById('tapText');
     if(!card || !closed || !open || !tap || card.dataset.openAnimationReady) return;
     card.dataset.openAnimationReady='1';
-    // A imagem adicionada para a cartinha aberta é esta PNG. A cartinha fechada continua sendo a IMG-20260919-WA0104.jpg.
-    open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260922';
-    open.alt='Cartinha aberta';
     const style=document.createElement('style');
     style.textContent=`
       #envCard:not(.realOpening) #envClosed{display:block!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:2!important}
-      #envCard:not(.realOpening) #envOpen{opacity:0!important;visibility:hidden!important;z-index:1!important}
+      #envCard:not(.realOpening) #envOpen{display:block!important;opacity:0!important;visibility:hidden!important;z-index:1!important}
       .envCard.realOpening{overflow:visible}
-      .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
-      .envCard.realOpening #envOpen{visibility:visible!important;animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;z-index:3!important}
-      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-      .envCard.realOpening + .tap{color:#000!important;text-shadow:none!important}
-      @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.045)}}
-      @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}35%{clip-path:inset(62% 0 0 0);transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);transform:translateY(.5%) scale(.992)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
+      .envCard.realOpening #envClosed{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+      .envCard.realOpening #envOpen{display:block!important;visibility:visible!important;opacity:1!important;z-index:3!important;animation:envelopeOpenIn 1.55s cubic-bezier(.2,.75,.2,1) forwards!important}
+      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;height:0!important;margin:0!important}
+      @keyframes envelopeOpenIn{
+        0%{clip-path:inset(100% 0 0 0);opacity:0;transform:translateY(8%) scale(.92)}
+        18%{clip-path:inset(82% 0 0 0);opacity:1;transform:translateY(6%) scale(.94)}
+        45%{clip-path:inset(52% 0 0 0);transform:translateY(3%) scale(.97)}
+        72%{clip-path:inset(24% 0 0 0);transform:translateY(.8%) scale(.99)}
+        100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}
+      }
     `;
     document.head.appendChild(style);
     card.addEventListener('click',function(e){
@@ -75,9 +83,18 @@ window.AliceDB = null;
       e.preventDefault();
       e.stopImmediatePropagation();
       card.dataset.realOpened='1';
+      closed.style.setProperty('display','none','important');
+      closed.style.setProperty('visibility','hidden','important');
+      closed.style.setProperty('opacity','0','important');
       tap.style.setProperty('display','none','important');
       tap.style.setProperty('opacity','0','important');
       tap.style.setProperty('visibility','hidden','important');
+      tap.style.setProperty('pointer-events','none','important');
+      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
+      open.alt='';
+      open.style.setProperty('display','block','important');
+      open.style.setProperty('visibility','visible','important');
+      open.style.setProperty('z-index','3','important');
       card.classList.add('realOpening');
       setTimeout(function(){ if(typeof show==='function') show('rules'); },3200);
     },true);
