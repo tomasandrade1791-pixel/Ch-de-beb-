@@ -11,7 +11,6 @@ window.AliceDB = null;
     if(old) old.style.display = 'none';
     const sub = stage.querySelector('.sub');
     if(sub) sub.style.display = 'none';
-
     const style = document.createElement('style');
     style.textContent = `
       .aliceLogo{position:relative;z-index:4;display:flex;align-items:flex-end;justify-content:center;gap:0;color:#2f61b8;line-height:.8;white-space:nowrap;filter:drop-shadow(0 0 5px rgba(38,88,170,.38)) drop-shadow(0 0 18px rgba(8,36,74,.32));animation:aliceLogoReveal 5.2s ease-in-out both;user-select:none}
@@ -21,7 +20,6 @@ window.AliceDB = null;
       @media(max-width:650px){.aliceLogo .aliceWord{font-size:clamp(92px,25vw,170px)}.aliceLogo .aliceStar{font-size:clamp(60px,14vw,100px);margin-left:-2px}}
     `;
     document.head.appendChild(style);
-
     const logo = document.createElement('div');
     logo.className = 'aliceLogo';
     logo.setAttribute('aria-label','Alice');
@@ -38,19 +36,19 @@ window.AliceDB = null;
       closed.alt = 'Cartinha fechada';
       closed.style.display = 'block';
     }
-
     const tap = document.getElementById('tapText');
     if(tap){
       tap.textContent = 'TOQUE NA CARTINHA PARA ABRIR';
       if(card && card.dataset.realOpened){
         tap.style.display = 'none';
         tap.style.opacity = '0';
+        tap.style.visibility = 'hidden';
       }else{
         tap.style.display = 'block';
         tap.style.opacity = '1';
+        tap.style.visibility = 'visible';
       }
     }
-
     const open = document.getElementById('envOpen');
     if(open){
       open.src = 'https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000000fbc820ebc60435059877b79.png?v=20260920';
@@ -66,21 +64,18 @@ window.AliceDB = null;
     const tap = document.getElementById('tapText');
     if(!card || !closed || !open || card.dataset.openAnimationReady) return;
     card.dataset.openAnimationReady='1';
-
     const style = document.createElement('style');
     style.textContent = `
       .envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.45s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
       .envCard.realOpening + .tap{animation:tapOut .28s ease forwards}
+      .envCard.realOpening + .tap{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}45%{opacity:1;transform:scale(1.018) rotate(-.25deg)}100%{opacity:0;transform:scale(1.045) rotate(-.7deg)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94);filter:drop-shadow(0 0 0 rgba(215,184,106,0))}35%{clip-path:inset(62% 0 0 0);opacity:1;transform:translateY(3%) scale(.965)}68%{clip-path:inset(22% 0 0 0);opacity:1;transform:translateY(.5%) scale(.992);filter:drop-shadow(0 0 20px rgba(215,184,106,.18))}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 30px rgba(215,184,106,.35))}}
       @keyframes tapOut{to{opacity:0;visibility:hidden}}
     `;
     document.head.appendChild(style);
-
-    // Captura o toque antes do listener antigo do index.html.
-    // Depois da abertura, permanece somente a cartinha aberta e então vai direto para as regras.
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened) return;
       e.preventDefault();
@@ -89,8 +84,8 @@ window.AliceDB = null;
       tap.style.pointerEvents='none';
       tap.style.display='none';
       tap.style.opacity='0';
+      tap.style.visibility='hidden';
       card.classList.add('realOpening');
-
       setTimeout(function(){
         if(typeof show==='function') show('rules');
       },3200);
@@ -106,16 +101,13 @@ window.AliceDB = null;
         return;
       }
       clearInterval(timer);
-
       const baseRenderRule=window.renderRule;
       const baseNext=window.next;
       const basePrev=window.prev;
       let intro=true;
-
       window.renderRule=function(){
         const rp=document.getElementById('rp');
         if(!rp) return;
-
         if(intro){
           rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1>'+
             '<p class="intro"><strong>Queridos amigos e familiares,</strong><br>'+
@@ -126,29 +118,13 @@ window.AliceDB = null;
           baseRenderRule();
         }
       };
-
       window.next=function(){
-        if(intro){
-          intro=false;
-          ri=0;
-          window.renderRule();
-        }else{
-          baseNext();
-        }
+        if(intro){intro=false;ri=0;window.renderRule();}else{baseNext();}
       };
-
       window.prev=function(){
-        if(!intro && ri===0){
-          intro=true;
-          window.renderRule();
-        }else if(!intro){
-          basePrev();
-        }
+        if(!intro && ri===0){intro=true;window.renderRule();}else if(!intro){basePrev();}
       };
-
-      intro=true;
-      ri=0;
-      window.renderRule();
+      intro=true;ri=0;window.renderRule();
     },100);
   }
 
