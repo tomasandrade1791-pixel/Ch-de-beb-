@@ -1,43 +1,38 @@
-// Configuração opcional do Supabase.
-// Nenhuma imagem da cartinha ou nenhuma animação é alterada aqui.
+// Cole aqui SOMENTE a URL do projeto e a chave pública (publishable/anon).
+// Nunca coloque service_role ou qualquer chave secreta neste arquivo.
 window.AliceDB = null;
 
-// Remove somente o fundo preto da imagem da Alice em tempo de execução.
+// Correções de arquivos sem alterar as artes ou a animação da Alice.
 document.addEventListener('DOMContentLoaded', function(){
-  const alice=document.querySelector('#alice .aliceArt');
-  if(!alice) return;
+  const alice = document.querySelector('#alice .aliceArt');
+  const closed = document.getElementById('envClosed');
+  const open = document.getElementById('envOpen');
+  const card = document.getElementById('envCard');
+  const tap = document.getElementById('tapText');
 
-  alice.crossOrigin='anonymous';
-  alice.addEventListener('load', function(){
-    const w=alice.naturalWidth, h=alice.naturalHeight;
-    if(!w || !h) return;
+  // Arquivos que realmente existem no repositório.
+  if (alice) alice.src = 'IMG-20260919-WA0107.jpg';
+  if (closed) closed.src = 'IMG-20260919-WA0104.jpg';
+  if (open) open.src = 'file_000000007f04820e9ff7fd2ea074c872.png';
 
-    const canvas=document.createElement('canvas');
-    canvas.width=w;
-    canvas.height=h;
-    const ctx=canvas.getContext('2d');
-    if(!ctx) return;
+  // Mantém a animação da cartinha, mas depois da abertura vai direto
+  // para as regras. Não passa pela tela da cartinha fechada novamente.
+  if (card) {
+    const cleanCard = card.cloneNode(true);
+    card.replaceWith(cleanCard);
 
-    try{
-      ctx.drawImage(alice,0,0,w,h);
-      const data=ctx.getImageData(0,0,w,h);
-      const p=data.data;
-
-      for(let i=0;i<p.length;i+=4){
-        const r=p[i], g=p[i+1], b=p[i+2];
-        const m=Math.max(r,g,b);
-        // Preto/quase-preto vira transparente; o azul da Alice permanece.
-        p[i+3]=m<=10 ? 0 : Math.min(255,Math.round((m-10)*2.2));
-      }
-
-      ctx.putImageData(data,0,0);
-      alice.src=canvas.toDataURL('image/png');
-    }catch(e){
-      // Se o navegador bloquear o canvas, mantém a imagem original.
-      console.warn('Não foi possível remover o fundo da Alice:',e);
-    }
-  },{once:true});
-
-  // Se a imagem já estiver em cache quando o listener for registrado.
-  if(alice.complete) alice.dispatchEvent(new Event('load'));
+    let opened = false;
+    cleanCard.addEventListener('click', function(){
+      if (opened) return;
+      opened = true;
+      cleanCard.classList.add('opening');
+      if (tap) tap.textContent = '';
+      setTimeout(function(){
+        const rules = document.getElementById('rules');
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+        if (rules) rules.classList.add('on');
+        window.scrollTo(0,0);
+      }, 1500);
+    });
+  }
 });
