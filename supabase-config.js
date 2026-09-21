@@ -2,8 +2,9 @@
 // Nunca coloque service_role ou qualquer chave secreta neste arquivo.
 window.AliceDB = null;
 
-// Não altera cartinha, animação ou regras. Apenas garante a imagem correta da Alice.
+// Mantém todas as animações no index.html e apenas corrige a transparência visual da imagem da Alice.
 document.addEventListener('DOMContentLoaded', function(){
-  const alice=document.querySelector('#alice .aliceArt');
-  if(alice) alice.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0107.jpg?v=20260921';
+  const img=document.querySelector('#alice .aliceArt');
+  if(!img) return;
+  img.style.mixBlendMode='screen';
 });
