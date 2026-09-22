@@ -194,3 +194,28 @@ window.AliceDB = null;
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
+
+// Corrige somente a imagem da cena da Alice. As outras etapas do convite permanecem intactas.
+(function(){
+  const aliceUrl='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/alice.svg?v=20260922';
+  function applyAliceImage(){
+    const img=document.querySelector('#alice .aliceArt');
+    if(!img) return;
+    if(img.src!==aliceUrl) img.src=aliceUrl;
+    img.alt='Alice';
+    img.style.display='block';
+  }
+  function start(){
+    applyAliceImage();
+    setTimeout(applyAliceImage,50);
+    setTimeout(applyAliceImage,300);
+    const section=document.getElementById('alice');
+    if(section){
+      new MutationObserver(function(){
+        if(section.classList.contains('on')) applyAliceImage();
+      }).observe(section,{attributes:true,attributeFilter:['class']});
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
+  else start();
+})();
