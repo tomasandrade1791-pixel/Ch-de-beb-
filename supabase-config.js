@@ -14,18 +14,31 @@ window.AliceDB = null;
     const logo = stage.querySelector('.aliceLogo');
 
     if(logo) logo.remove();
+
+    // Reinicia os elementos visuais da Alice somente quando a cena entra na tela.
+    // A imagem original permanece exatamente a mesma; apenas a animação é reiniciada.
     if(old){
-      old.style.display = 'block';
-      old.style.animation = 'none';
-      void old.offsetWidth;
-      old.style.animation = 'aliceReveal 5.2s ease-in-out both';
+      const freshOld = old.cloneNode(true);
+      old.replaceWith(freshOld);
     }
     if(light){
-      light.style.display = 'block';
-      light.style.animation = 'none';
-      void light.offsetWidth;
-      light.style.animation = 'navyLight 5.2s ease-in-out both';
-      light.querySelectorAll(':before,:after');
+      const freshLight = light.cloneNode(true);
+      light.replaceWith(freshLight);
+    }
+
+    const freshOld = stage.querySelector('.aliceArt');
+    const freshLight = stage.querySelector('.aliceLight');
+    if(freshOld){
+      freshOld.style.display = 'block';
+      freshOld.style.animation = 'none';
+      void freshOld.offsetWidth;
+      freshOld.style.animation = 'aliceReveal 5.2s ease-in-out both';
+    }
+    if(freshLight){
+      freshLight.style.display = 'block';
+      freshLight.style.animation = 'none';
+      void freshLight.offsetWidth;
+      freshLight.style.animation = 'navyLight 5.2s ease-in-out both';
     }
     if(sub) sub.style.display = 'block';
   }
