@@ -21,33 +21,63 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-// Abertura cinematográfica: esta camada controla apenas a introdução e depois entrega a cena da Alice.
 (function(){
   function startIntro(){
     if(document.getElementById('cinematicIntro'))return;
     const css=document.createElement('style');
-    css.textContent=`#cinematicIntro{position:fixed;inset:0;background:#000;color:#f4ead5;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;opacity:1;transition:opacity .7s ease}#cinematicIntro.hide{opacity:0;pointer-events:none}.cinematicText{font-family:Georgia,"Times New Roman",serif;font-size:clamp(25px,6vw,48px);line-height:1.3;max-width:850px;opacity:0;transition:opacity .7s ease}.cinematicText.show{opacity:1}`;
+    css.textContent='#cinematicIntro{position:fixed;inset:0;background:#000;color:#f4ead5;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px}.cinematicText{font-family:Georgia,"Times New Roman",serif;font-size:clamp(25px,6vw,48px);line-height:1.3;max-width:850px;opacity:0;transition:opacity .4s ease}.cinematicText.show{opacity:1}';
     document.head.appendChild(css);
     const overlay=document.createElement('div');overlay.id='cinematicIntro';
     const text=document.createElement('div');text.className='cinematicText';overlay.appendChild(text);document.body.appendChild(overlay);
     const first='Uma pequena história está prestes a começar...';
     const second='Tem alguém muito especial esperando para conhecer vocês...';
     const third='Agora fiquem com a surpresa...';
-    const setText=(value)=>{text.classList.remove('show');setTimeout(()=>{text.textContent=value;text.classList.add('show');},100);};
-    // 0-3s preto; 3-8s primeira; 8-16s preto; 16-21s segunda; 21-29s preto; 29-34s terceira; 34-44s suspense; 44s Alice.
-    setTimeout(()=>setText(first),3000);
-    setTimeout(()=>{text.classList.remove('show');},8000);
-    setTimeout(()=>setText(second),16000);
-    setTimeout(()=>{text.classList.remove('show');},21000);
-    setTimeout(()=>setText(third),29000);
-    setTimeout(()=>{text.classList.remove('show');},34000);
-    setTimeout(()=>{
-      const views=document.querySelectorAll('.view');views.forEach(v=>v.classList.remove('on'));
-      const alice=document.getElementById('alice');if(alice)alice.classList.add('on');
-      overlay.classList.add('hide');
-      setTimeout(()=>{overlay.remove();restartAliceAnimationDirect();},750);
-    },44000);
+    const at=(ms,fn)=>setTimeout(fn,ms);
+    const showText=value=>{text.textContent=value;text.classList.add('show');};
+    const hideText=()=>text.classList.remove('show');
+    // Sequência única: 3s preto, 5s frase, 8s preto, 5s frase, 8s preto, 5s frase, 10s suspense, Alice.
+    at(3000,()=>showText(first));
+    at(8000,hideText);
+    at(16000,()=>showText(second));
+    at(21000,hideText);
+    at(29000,()=>showText(third));
+    at(34000,hideText);
+    at(44000,()=>{
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+      const alice=document.getElementById('alice');
+      if(alice)alice.classList.add('on');
+      restartAliceAnimationDirect();
+      overlay.remove();
+    });
   }
-  function restartAliceAnimationDirect(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
+  function restartAliceAnimationDirect(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startIntro);else startIntro();
+})();
+
+// Controlador final: impede que os timers antigos do index.html alterem a abertura durante os primeiros 44 segundos.
+(function(){
+  function run(){
+    const overlay=document.getElementById('cinematicIntro');
+    if(!overlay)return;
+    const text=overlay.querySelector('.cinematicText');
+    const started=performance.now();
+    const first='Uma pequena história está prestes a começar...';
+    const second='Tem alguém muito especial esperando para conhecer vocês...';
+    const third='Agora fiquem com a surpresa...';
+    function tick(){
+      const t=(performance.now()-started)/1000;
+      if(t<3){text.classList.remove('show');}
+      else if(t<8){text.textContent=first;text.classList.add('show');}
+      else if(t<16){text.classList.remove('show');}
+      else if(t<21){text.textContent=second;text.classList.add('show');}
+      else if(t<29){text.classList.remove('show');}
+      else if(t<34){text.textContent=third;text.classList.add('show');}
+      else if(t<44){text.classList.remove('show');}
+      else{document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const alice=document.getElementById('alice');if(alice)alice.classList.add('on');restartAliceAnimationDirectFinal();overlay.remove();return;}
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  function restartAliceAnimationDirectFinal(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 })();
