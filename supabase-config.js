@@ -15,30 +15,16 @@ window.AliceDB = null;
 
     if(logo) logo.remove();
 
-    // Reinicia os elementos visuais da Alice somente quando a cena entra na tela.
-    // A imagem original permanece exatamente a mesma; apenas a animação é reiniciada.
+    // A cena da Alice fica estática por enquanto para podermos ajustar o visual.
     if(old){
-      const freshOld = old.cloneNode(true);
-      old.replaceWith(freshOld);
+      old.style.display = 'block';
+      old.style.animation = 'none';
+      old.style.opacity = '1';
+      old.style.transform = 'none';
     }
     if(light){
-      const freshLight = light.cloneNode(true);
-      light.replaceWith(freshLight);
-    }
-
-    const freshOld = stage.querySelector('.aliceArt');
-    const freshLight = stage.querySelector('.aliceLight');
-    if(freshOld){
-      freshOld.style.display = 'block';
-      freshOld.style.animation = 'none';
-      void freshOld.offsetWidth;
-      freshOld.style.animation = 'aliceReveal 5.2s ease-in-out both';
-    }
-    if(freshLight){
-      freshLight.style.display = 'block';
-      freshLight.style.animation = 'none';
-      void freshLight.offsetWidth;
-      freshLight.style.animation = 'navyLight 5.2s ease-in-out both';
+      light.style.display = 'none';
+      light.style.animation = 'none';
     }
     if(sub) sub.style.display = 'block';
   }
@@ -49,8 +35,16 @@ window.AliceDB = null;
     const old = stage.querySelector('.aliceArt');
     const light = stage.querySelector('.aliceLight');
     const sub = stage.querySelector('.sub');
-    if(old) old.style.display = 'block';
-    if(light) light.style.display = 'block';
+    if(old){
+      old.style.display = 'block';
+      old.style.animation = 'none';
+      old.style.opacity = '1';
+      old.style.transform = 'none';
+    }
+    if(light){
+      light.style.display = 'none';
+      light.style.animation = 'none';
+    }
     if(sub) sub.style.display = 'block';
     const logo = stage.querySelector('.aliceLogo');
     if(logo) logo.remove();
@@ -204,6 +198,9 @@ window.AliceDB = null;
     if(img.src!==aliceUrl) img.src=aliceUrl;
     img.alt='Alice';
     img.style.display='block';
+    img.style.animation='none';
+    img.style.opacity='1';
+    img.style.transform='none';
   }
   function start(){
     applyAliceImage();
@@ -218,4 +215,14 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
   else start();
+})();
+
+// Enquanto ajustamos a cena da Alice, mantemos tudo completamente estático.
+(function(){
+  const style=document.createElement('style');
+  style.textContent=`
+    #alice .aliceArt{animation:none!important;opacity:1!important;transform:none!important;}
+    #alice .aliceLight,#alice .aliceLight:before,#alice .aliceLight:after{display:none!important;animation:none!important;}
+  `;
+  document.head.appendChild(style);
 })();
