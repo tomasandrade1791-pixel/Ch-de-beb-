@@ -150,7 +150,7 @@ window.AliceDB = null;
   else init();
 })();
 
-// Abertura cinematográfica: a primeira frase some e deixa exatamente 8s de tela preta antes da segunda frase.
+// Abertura cinematográfica com tempos definidos: 3s preto, 5s frase, 8s preto, 5s frase, 8s preto, 5s frase, 10s preto e então Alice.
 (function(){
   function startIntro(){
     const open=document.getElementById('open');
@@ -159,32 +159,40 @@ window.AliceDB = null;
     const alice=document.getElementById('alice');
     if(!open || !op || !surprise || !alice) return;
 
-    // Esconde temporariamente as telas controladas pelo roteiro antigo.
     open.classList.add('on');
     surprise.classList.remove('on');
     alice.classList.remove('on');
-    op.textContent='Uma pequena história está prestes a começar...';
+    op.textContent='';
 
-    // Reinicia a sequência sempre que a página é aberta.
+    // 1) Tela preta por 3 segundos.
     setTimeout(function(){
-      op.textContent='';
-      // 8 segundos de suspense em tela totalmente preta.
+      // 2) Primeira frase por 5 segundos.
+      op.textContent='Uma pequena história está prestes a começar...';
       setTimeout(function(){
-        op.textContent='Tem alguém muito especial esperando para conhecer vocês...';
+        // 3) Tela preta por 8 segundos.
+        op.textContent='';
         setTimeout(function(){
-          op.textContent='';
+          // 4) Segunda frase por 5 segundos.
+          op.textContent='Tem alguém muito especial esperando para conhecer vocês...';
           setTimeout(function(){
-            op.textContent='Agora fiquem com a surpresa...';
+            // 5) Tela preta por 8 segundos.
+            op.textContent='';
             setTimeout(function(){
-              op.textContent='';
+              // 6) Terceira frase por 5 segundos.
+              op.textContent='Agora fiquem com a surpresa...';
               setTimeout(function(){
-                if(typeof show==='function') show('alice');
-                else { open.classList.remove('on'); alice.classList.add('on'); }
-              },3000);
-            },3500);
-          },1200);
-        },4000);
-      },8000);
+                // 7) Tela preta com suspense por 10 segundos.
+                op.textContent='';
+                setTimeout(function(){
+                  // 8) Revelação: inicia a animação da Alice.
+                  if(typeof show==='function') show('alice');
+                  else { open.classList.remove('on'); alice.classList.add('on'); }
+                },10000);
+              },5000);
+            },8000);
+          },5000);
+        },8000);
+      },5000);
     },3000);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',startIntro);
