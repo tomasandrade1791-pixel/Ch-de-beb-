@@ -3,10 +3,11 @@ window.AliceDB = null;
 
 (function(){
   function fixEnvelopeStage(){
-    const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen');
-    if(closed){closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';closed.alt='Cartinha fechada';closed.style.display='block';}
+    const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen'), paper=document.getElementById('paperReveal');
+    if(paper){paper.classList.remove('on');paper.style.display='none';}
+    if(closed){closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0103.jpg?v=20260926';closed.alt='Cartinha fechada';closed.style.display='block';}
     if(tap){tap.textContent='TOQUE NA CARTINHA PARA ABRIR';tap.style.display='block';tap.style.opacity='1';}
-    if(open){open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000007f04820e9ff7fd2ea074c872.png?v=20260921';open.alt='Cartinha aberta';open.style.display='block';}
+    if(open){open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000007f04820e9ff7fd2ea074c872.png?v=20260926';open.alt='Cartinha aberta';open.style.display='block';}
   }
 
   function initEnvelopeAnimation(){
@@ -15,6 +16,7 @@ window.AliceDB = null;
     card.dataset.openAnimationReady='1';
     const style=document.createElement('style');
     style.textContent=`
+      #paperReveal{display:none!important}
       .envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
@@ -28,6 +30,8 @@ window.AliceDB = null;
       if(card.dataset.realOpened)return;
       e.preventDefault();e.stopImmediatePropagation();card.dataset.realOpened='1';tap.style.pointerEvents='none';card.classList.add('realOpening');
       setTimeout(function(){
+        const paper=document.getElementById('paperReveal');
+        if(paper){paper.classList.remove('on');paper.style.display='none';}
         document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         const rules=document.getElementById('rules');
         if(rules)rules.classList.add('on');
