@@ -174,13 +174,14 @@ window.AliceDB = null;
 
 /*
   TRANSIÇÃO ALICE -> CARTINHA FECHADA.
+  A transição é feita diretamente pelas classes da página, sem depender da função show().
   Não altera a abertura, a animação da Alice nem a animação de abertura da cartinha.
-  Apenas avança automaticamente para a tela da cartinha depois que a revelação termina.
 */
 (function(){
   function initAliceToEnvelope(){
     const alice=document.getElementById('alice');
-    if(!alice||alice.dataset.envelopeTransitionReady)return;
+    const env=document.getElementById('env');
+    if(!alice||!env||alice.dataset.envelopeTransitionReady)return;
     alice.dataset.envelopeTransitionReady='1';
 
     let scheduled=false;
@@ -188,15 +189,9 @@ window.AliceDB = null;
       if(scheduled)return;
       scheduled=true;
       setTimeout(function(){
-        function tryShow(){
-          if(typeof window.show==='function'){
-            const current=document.getElementById('alice');
-            if(current&&current.classList.contains('on'))window.show('env');
-          }else{
-            setTimeout(tryShow,300);
-          }
-        }
-        tryShow();
+        if(!alice.classList.contains('on'))return;
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+        env.classList.add('on');
       },6500);
     }
 
