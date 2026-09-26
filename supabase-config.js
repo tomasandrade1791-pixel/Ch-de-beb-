@@ -163,12 +163,47 @@ window.AliceDB = null;
         img.src=canvas.toDataURL('image/png');
         img.style.mixBlendMode='normal';
       }catch(e){
+        // Se o navegador bloquear o processamento, mantém a imagem original sem quebrar a página.
         img.style.mixBlendMode='screen';
       }
     };
     if(img.complete)process();else img.addEventListener('load',process,{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
+})();
+
+/*
+  TRANSIÇÃO ALICE -> CARTINHA FECHADA.
+  A transição é feita diretamente pelas classes da página, sem depender da função show().
+  Não altera a abertura, a animação da Alice nem a animação de abertura da cartinha.
+*/
+(function(){
+  function initAliceToEnvelope(){
+    const alice=document.getElementById('alice');
+    const env=document.getElementById('env');
+    if(!alice||!env||alice.dataset.envelopeTransitionReady)return;
+    alice.dataset.envelopeTransitionReady='1';
+
+    let scheduled=false;
+    function goToEnvelope(){
+      if(scheduled)return;
+      scheduled=true;
+      setTimeout(function(){
+        if(!alice.classList.contains('on'))return;
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+        env.classList.add('on');
+      },6500);
+    }
+
+    const observer=new MutationObserver(function(){
+      if(alice.classList.contains('on'))goToEnvelope();
+    });
+    observer.observe(alice,{attributes:true,attributeFilter:['class']});
+
+    if(alice.classList.contains('on'))goToEnvelope();
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
 
 /* Apenas na revelação da Alice: esconder a frase antiga abaixo da imagem. */
