@@ -170,3 +170,10 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
+
+/* Apenas na revelação da Alice: esconder a frase antiga abaixo da imagem. */
+(function(){
+  const style=document.createElement('style');
+  style.textContent='.aliceStage .sub{display:none!important}';
+  document.head.appendChild(style);
+})();
