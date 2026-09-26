@@ -74,13 +74,13 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 })();
 
-// Corrige somente a imagem da Alice usando o arquivo correto do projeto.
+// Corrige somente a imagem da Alice usando o arquivo original recuperado do historico.
 (function(){
-  const aliceUrl='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/alice.svg?v=20260922';
+  const aliceUrl='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/262556d7611442ff5e13e894f7a9bdb82acdd522/IMG-20260919-WA0103.jpg?v=20260925';
   function forceAliceImage(){
     const img=document.querySelector('#alice .aliceArt');
     if(!img)return;
-    if(!img.src.includes('/alice.svg'))img.src=aliceUrl;
+    img.src=aliceUrl;
     img.alt='Alice';
     img.style.display='block';
   }
