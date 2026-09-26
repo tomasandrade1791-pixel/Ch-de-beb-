@@ -22,8 +22,23 @@ window.AliceDB = null;
     const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
     card.dataset.openAnimationReady='1';
+
+    function syncOpenToClosed(){
+      if(!closed||!open)return;
+      const width=closed.offsetWidth;
+      const height=closed.offsetHeight;
+      if(!width||!height)return;
+      open.style.width=width+'px';
+      open.style.height=height+'px';
+      open.style.maxWidth='none';
+      open.style.maxHeight='none';
+      open.style.objectFit='fill';
+    }
+
     const style=document.createElement('style');
     style.textContent=`
+      .envCard{position:relative;display:flex;align-items:center;justify-content:center;min-height:58vh}
+      .envCard img{position:absolute;inset:0;margin:auto;object-fit:fill;filter:drop-shadow(0 25px 40px #000)}
       .envCard.realOpening{overflow:visible}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
@@ -33,9 +48,21 @@ window.AliceDB = null;
       @keyframes tapOut{to{opacity:0;visibility:hidden}}
     `;
     document.head.appendChild(style);
+
+    function prepareSize(){
+      if(closed.complete&&closed.naturalWidth)syncOpenToClosed();
+      else closed.addEventListener('load',syncOpenToClosed,{once:true});
+    }
+    prepareSize();
+    window.addEventListener('resize',syncOpenToClosed);
+
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened)return;
-      e.preventDefault();e.stopImmediatePropagation();card.dataset.realOpened='1';tap.style.pointerEvents='none';card.classList.add('realOpening');
+      e.preventDefault();e.stopImmediatePropagation();
+      syncOpenToClosed();
+      card.dataset.realOpened='1';
+      tap.style.pointerEvents='none';
+      card.classList.add('realOpening');
       setTimeout(function(){if(typeof show==='function')show('paperReveal')},1450);
       setTimeout(function(){if(typeof show==='function')show('rules')},2950);
     },true);
