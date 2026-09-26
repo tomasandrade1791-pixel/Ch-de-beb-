@@ -29,14 +29,9 @@ window.AliceDB = null;
       e.preventDefault();e.stopImmediatePropagation();card.dataset.realOpened='1';tap.style.pointerEvents='none';card.classList.add('realOpening');
       setTimeout(function(){
         document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
-        const paper=document.getElementById('paperReveal');
-        if(paper)paper.classList.add('on');
-      },1450);
-      setTimeout(function(){
-        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         const rules=document.getElementById('rules');
         if(rules)rules.classList.add('on');
-      },2950);
+      },1450);
     },true);
   }
 
