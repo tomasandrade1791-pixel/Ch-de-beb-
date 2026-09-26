@@ -23,23 +23,31 @@ window.AliceDB = null;
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
     card.dataset.openAnimationReady='1';
 
-    function syncOpenToClosed(){
-      if(!closed||!open)return;
-      const width=closed.offsetWidth;
-      const height=closed.offsetHeight;
-      if(!width||!height)return;
-      open.style.width=width+'px';
-      open.style.height=height+'px';
-      open.style.maxWidth='none';
-      open.style.maxHeight='none';
-      open.style.objectFit='fill';
-    }
-
     const style=document.createElement('style');
     style.textContent=`
-      .envCard{position:relative;display:flex;align-items:center;justify-content:center;min-height:58vh}
-      .envCard img{position:absolute;inset:0;margin:auto;object-fit:fill;filter:drop-shadow(0 25px 40px #000)}
-      .envCard.realOpening{overflow:visible}
+      /* Um único quadro físico para as duas artes: 3:2, igual à cartinha fechada. */
+      .envCard{
+        position:relative!important;
+        width:min(88vw,620px)!important;
+        aspect-ratio:3 / 2!important;
+        height:auto!important;
+        min-height:0!important;
+        margin:0 auto!important;
+        display:block!important;
+        overflow:visible!important;
+      }
+      .envCard img{
+        position:absolute!important;
+        inset:0!important;
+        width:100%!important;
+        height:100%!important;
+        max-width:none!important;
+        max-height:none!important;
+        margin:0!important;
+        object-fit:fill!important;
+        filter:drop-shadow(0 25px 40px #000);
+      }
+      .envCard.realOpening{overflow:visible!important}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
       .envCard.realOpening + .tap{animation:tapOut .28s ease forwards}
@@ -49,17 +57,9 @@ window.AliceDB = null;
     `;
     document.head.appendChild(style);
 
-    function prepareSize(){
-      if(closed.complete&&closed.naturalWidth)syncOpenToClosed();
-      else closed.addEventListener('load',syncOpenToClosed,{once:true});
-    }
-    prepareSize();
-    window.addEventListener('resize',syncOpenToClosed);
-
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened)return;
       e.preventDefault();e.stopImmediatePropagation();
-      syncOpenToClosed();
       card.dataset.realOpened='1';
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
@@ -190,7 +190,6 @@ window.AliceDB = null;
         img.src=canvas.toDataURL('image/png');
         img.style.mixBlendMode='normal';
       }catch(e){
-        // Se o navegador bloquear o processamento, mantém a imagem original sem quebrar a página.
         img.style.mixBlendMode='screen';
       }
     };
@@ -199,18 +198,13 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
 
-/*
-  TRANSIÇÃO ALICE -> CARTINHA FECHADA.
-  A transição é feita diretamente pelas classes da página, sem depender da função show().
-  Não altera a abertura, a animação da Alice nem a animação de abertura da cartinha.
-*/
+/* TRANSIÇÃO ALICE -> CARTINHA FECHADA. */
 (function(){
   function initAliceToEnvelope(){
     const alice=document.getElementById('alice');
     const env=document.getElementById('env');
     if(!alice||!env||alice.dataset.envelopeTransitionReady)return;
     alice.dataset.envelopeTransitionReady='1';
-
     let scheduled=false;
     function goToEnvelope(){
       if(scheduled)return;
@@ -221,14 +215,9 @@ window.AliceDB = null;
         env.classList.add('on');
       },6500);
     }
-
-    const observer=new MutationObserver(function(){
-      if(alice.classList.contains('on'))goToEnvelope();
-    });
+    const observer=new MutationObserver(function(){if(alice.classList.contains('on'))goToEnvelope();});
     observer.observe(alice,{attributes:true,attributeFilter:['class']});
-
     if(alice.classList.contains('on'))goToEnvelope();
   }
-
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
