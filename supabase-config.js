@@ -35,14 +35,14 @@ window.AliceDB = null;
     const at=(ms,fn)=>setTimeout(fn,ms);
     const showText=value=>{text.textContent=value;text.classList.add('show');};
     const hideText=()=>text.classList.remove('show');
-    // Sequência única: 3s preto, 5s frase, 8s preto, 5s frase, 8s preto, 5s frase, 10s suspense, Alice.
+    // Sequência única: 3s preto, 5s frase, 5s preto, 5s frase, 5s preto, 5s frase, 10s suspense, Alice.
     at(3000,()=>showText(first));
     at(8000,hideText);
-    at(16000,()=>showText(second));
-    at(21000,hideText);
-    at(29000,()=>showText(third));
-    at(34000,hideText);
-    at(44000,()=>{
+    at(13000,()=>showText(second));
+    at(18000,hideText);
+    at(23000,()=>showText(third));
+    at(28000,hideText);
+    at(38000,()=>{
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
       const alice=document.getElementById('alice');
       if(alice)alice.classList.add('on');
@@ -54,7 +54,7 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startIntro);else startIntro();
 })();
 
-// Controlador final: impede que os timers antigos do index.html alterem a abertura durante os primeiros 44 segundos.
+// Controlador final: impede que os timers antigos do index.html alterem a abertura durante os primeiros 38 segundos.
 (function(){
   function run(){
     const overlay=document.getElementById('cinematicIntro');
@@ -68,11 +68,11 @@ window.AliceDB = null;
       const t=(performance.now()-started)/1000;
       if(t<3){text.classList.remove('show');}
       else if(t<8){text.textContent=first;text.classList.add('show');}
-      else if(t<16){text.classList.remove('show');}
-      else if(t<21){text.textContent=second;text.classList.add('show');}
-      else if(t<29){text.classList.remove('show');}
-      else if(t<34){text.textContent=third;text.classList.add('show');}
-      else if(t<44){text.classList.remove('show');}
+      else if(t<13){text.classList.remove('show');}
+      else if(t<18){text.textContent=second;text.classList.add('show');}
+      else if(t<23){text.classList.remove('show');}
+      else if(t<28){text.textContent=third;text.classList.add('show');}
+      else if(t<38){text.classList.remove('show');}
       else{document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const alice=document.getElementById('alice');if(alice)alice.classList.add('on');restartAliceAnimationDirectFinal();overlay.remove();return;}
       requestAnimationFrame(tick);
     }
