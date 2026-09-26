@@ -212,3 +212,40 @@ window.AliceDB = null;
   style.textContent='.aliceStage .sub{display:none!important}';
   document.head.appendChild(style);
 })();
+
+/*
+  AJUSTE 3.1 — cartinha aberta com o mesmo quadro da fechada.
+  O quadro é medido pela cartinha fechada e aplicado à aberta, mantendo a proporção da imagem aberta.
+  Isso centraliza as duas e evita alterar a abertura cinematográfica, a Alice ou as demais etapas.
+*/
+(function(){
+  function initEnvelopeSizeMatch(){
+    const closed=document.getElementById('envClosed');
+    const open=document.getElementById('envOpen');
+    if(!closed||!open||open.dataset.sizeMatchReady)return;
+    open.dataset.sizeMatchReady='1';
+
+    function apply(){
+      const r=closed.getBoundingClientRect();
+      if(r.width<2||r.height<2)return;
+      open.style.width=r.width+'px';
+      open.style.height=r.height+'px';
+      open.style.maxWidth='none';
+      open.style.maxHeight='none';
+      open.style.left='50%';
+      open.style.top='50%';
+      open.style.marginLeft=(-r.width/2)+'px';
+      open.style.marginTop=(-r.height/2)+'px';
+      open.style.objectFit='contain';
+    }
+
+    const schedule=()=>setTimeout(apply,0);
+    if(closed.complete)schedule();
+    closed.addEventListener('load',schedule);
+    window.addEventListener('resize',schedule);
+    setTimeout(apply,150);
+    setTimeout(apply,700);
+    setTimeout(apply,1700);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initEnvelopeSizeMatch);else initEnvelopeSizeMatch();
+})();
