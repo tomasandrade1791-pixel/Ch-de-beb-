@@ -35,26 +35,18 @@ window.AliceDB = null;
     const at=(ms,fn)=>setTimeout(fn,ms);
     const showText=value=>{text.textContent=value;text.classList.add('show');};
     const hideText=()=>text.classList.remove('show');
-    // Sequência única: 3s preto, 5s frase, 5s preto, 5s frase, 5s preto, 5s frase, 10s suspense, Alice.
     at(3000,()=>showText(first));
     at(8000,hideText);
     at(13000,()=>showText(second));
     at(18000,hideText);
     at(23000,()=>showText(third));
     at(28000,hideText);
-    at(38000,()=>{
-      document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
-      const alice=document.getElementById('alice');
-      if(alice)alice.classList.add('on');
-      restartAliceAnimationDirect();
-      overlay.remove();
-    });
+    at(38000,()=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const alice=document.getElementById('alice');if(alice)alice.classList.add('on');restartAliceAnimationDirect();overlay.remove();});
   }
   function restartAliceAnimationDirect(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startIntro);else startIntro();
 })();
 
-// Controlador final: impede que os timers antigos do index.html alterem a abertura durante os primeiros 38 segundos.
 (function(){
   function run(){
     const overlay=document.getElementById('cinematicIntro');
@@ -80,4 +72,25 @@ window.AliceDB = null;
   }
   function restartAliceAnimationDirectFinal(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
+
+// Corrige somente a imagem da Alice usando o arquivo correto do projeto.
+(function(){
+  const aliceUrl='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/alice.svg?v=20260922';
+  function forceAliceImage(){
+    const img=document.querySelector('#alice .aliceArt');
+    if(!img)return;
+    if(!img.src.includes('/alice.svg'))img.src=aliceUrl;
+    img.alt='Alice';
+    img.style.display='block';
+  }
+  function initAlice(){
+    forceAliceImage();
+    setTimeout(forceAliceImage,100);
+    setTimeout(forceAliceImage,500);
+    setTimeout(forceAliceImage,1500);
+    const section=document.getElementById('alice');
+    if(section)new MutationObserver(function(){if(section.classList.contains('on'))forceAliceImage();}).observe(section,{attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAlice);else initAlice();
 })();
