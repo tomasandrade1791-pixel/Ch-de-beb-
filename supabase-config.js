@@ -1,28 +1,98 @@
-// Cole aqui SOMENTE a URL do projeto e a chave pública (publishable/anon).
-// Nunca coloque service_role ou qualquer chave secreta neste arquivo.
+// Configuração segura: não guardar chaves secretas aqui.
 window.AliceDB = null;
 
 (function(){
-  function restartAliceAnimation(){
-    const section=document.getElementById('alice');
-    const stage=document.querySelector('.aliceStage');
-    if(!section||!stage||!section.classList.contains('on'))return;
-    const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight'),sub=stage.querySelector('.sub'),logo=stage.querySelector('.aliceLogo');
-    if(logo)logo.remove();
-    if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}
-    if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}
-    if(sub)sub.style.display='block';
+  // Ajustes da cartinha e da introdução das regras. Não interfere na abertura cinematográfica.
+  function fixEnvelopeStage(){
+    const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen');
+    if(closed){
+      closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';
+      closed.alt='Cartinha fechada';
+      closed.style.display='block';
+    }
+    if(tap){tap.textContent='TOQUE NA CARTINHA PARA ABRIR';tap.style.display='block';tap.style.opacity='1';}
+    if(open){
+      open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000007f04820e9ff7fd2ea074c872.png?v=20260921';
+      open.alt='Cartinha aberta';
+      open.style.display='block';
+    }
   }
-  function fixAliceStage(){const stage=document.querySelector('.aliceStage');if(!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight'),sub=stage.querySelector('.sub');if(old){old.style.display='block';light&& (light.style.display='block');sub&& (sub.style.display='block');}else{if(light)light.style.display='block';if(sub)sub.style.display='block';}const logo=stage.querySelector('.aliceLogo');if(logo)logo.remove();}
-  function fixEnvelopeStage(){const closed=document.getElementById('envClosed'),tap=document.getElementById('tapText'),open=document.getElementById('envOpen');if(closed){closed.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260920';closed.alt='Cartinha fechada';closed.style.display='block';}if(tap){tap.textContent='TOQUE NA CARTINHA PARA ABRIR';tap.style.display='block';tap.style.opacity='1';}if(open){open.src='https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/file_000000007f04820e9ff7fd2ea074c872.png?v=20260921';open.alt='Cartinha aberta';open.style.display='block';}}
-  function initEnvelopeAnimation(){const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');if(!card||!closed||!open||card.dataset.openAnimationReady)return;card.dataset.openAnimationReady='1';const style=document.createElement('style');style.textContent=`.envCard.realOpening{overflow:visible}.envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}.envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}.envCard.realOpening + .tap{animation:tapOut .28s ease forwards}@keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}55%{opacity:.95;transform:scale(1.025) rotate(-.4deg)}100%{opacity:0;transform:scale(1.055) rotate(-1deg)}}@keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}45%{clip-path:inset(35% 0 0 0);opacity:1;transform:translateY(1%) scale(.985)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}@keyframes tapOut{to{opacity:0;visibility:hidden}}`;document.head.appendChild(style);card.addEventListener('click',function(e){if(card.dataset.realOpened)return;e.preventDefault();e.stopImmediatePropagation();card.dataset.realOpened='1';tap.style.pointerEvents='none';card.classList.add('realOpening');setTimeout(function(){if(typeof show==='function')show('paperReveal')},1450);setTimeout(function(){if(typeof show==='function')show('rules')},2950);},true);}
-  function initRulesIntroSplit(){let tries=0;const timer=setInterval(function(){tries++;if(typeof window.renderRule!=='function'||!document.getElementById('rp')){if(tries>100)clearInterval(timer);return;}clearInterval(timer);const baseRenderRule=window.renderRule,baseNext=window.next,basePrev=window.prev;let intro=true;window.renderRule=function(){const rp=document.getElementById('rp');if(!rp)return;if(intro){rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p><div class="nav"><button class="btn" disabled>‹ VOLTAR</button><span class="counter">INTRODUÇÃO</span><button class="btn" onclick="next()">COMEÇAR ›</button></div>';}else baseRenderRule();};window.next=function(){if(intro){intro=false;ri=0;window.renderRule();}else baseNext();};window.prev=function(){if(!intro&&ri===0){intro=true;window.renderRule();}else if(!intro)basePrev();};intro=true;ri=0;window.renderRule();},100);}
-  function init(){fixAliceStage();fixEnvelopeStage();initEnvelopeAnimation();initRulesIntroSplit();const aliceSection=document.getElementById('alice');if(aliceSection)new MutationObserver(function(){restartAliceAnimation();}).observe(aliceSection,{attributes:true,attributeFilter:['class']});setTimeout(fixEnvelopeStage,500);setTimeout(fixEnvelopeStage,1500);setTimeout(initEnvelopeAnimation,50);setTimeout(restartAliceAnimation,100);setTimeout(restartAliceAnimation,500);}
+
+  function initEnvelopeAnimation(){
+    const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
+    if(!card||!closed||!open||card.dataset.openAnimationReady)return;
+    card.dataset.openAnimationReady='1';
+    const style=document.createElement('style');
+    style.textContent=`
+      .envCard.realOpening{overflow:visible}
+      .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
+      .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
+      .envCard.realOpening + .tap{animation:tapOut .28s ease forwards}
+      @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}55%{opacity:.95;transform:scale(1.025) rotate(-.4deg)}100%{opacity:0;transform:scale(1.055) rotate(-1deg)}}
+      @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}45%{clip-path:inset(35% 0 0 0);opacity:1;transform:translateY(1%) scale(.985)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
+      @keyframes tapOut{to{opacity:0;visibility:hidden}}
+    `;
+    document.head.appendChild(style);
+    card.addEventListener('click',function(e){
+      if(card.dataset.realOpened)return;
+      e.preventDefault();e.stopImmediatePropagation();card.dataset.realOpened='1';tap.style.pointerEvents='none';card.classList.add('realOpening');
+      setTimeout(function(){if(typeof show==='function')show('paperReveal')},1450);
+      setTimeout(function(){if(typeof show==='function')show('rules')},2950);
+    },true);
+  }
+
+  function initRulesIntroSplit(){
+    let tries=0;
+    const timer=setInterval(function(){
+      tries++;
+      if(typeof window.renderRule!=='function'||!document.getElementById('rp')){if(tries>100)clearInterval(timer);return;}
+      clearInterval(timer);
+      const baseRenderRule=window.renderRule,baseNext=window.next,basePrev=window.prev;
+      let intro=true;
+      window.renderRule=function(){
+        const rp=document.getElementById('rp');if(!rp)return;
+        if(intro){
+          rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p><div class="nav"><button class="btn" disabled>‹ VOLTAR</button><span class="counter">INTRODUÇÃO</span><button class="btn" onclick="next()">COMEÇAR ›</button></div>';
+        }else baseRenderRule();
+      };
+      window.next=function(){if(intro){intro=false;ri=0;window.renderRule();}else baseNext();};
+      window.prev=function(){if(!intro&&ri===0){intro=true;window.renderRule();}else if(!intro)basePrev();};
+      intro=true;ri=0;window.renderRule();
+    },100);
+  }
+
+  function init(){
+    fixEnvelopeStage();
+    initEnvelopeAnimation();
+    initRulesIntroSplit();
+    setTimeout(fixEnvelopeStage,500);
+    setTimeout(fixEnvelopeStage,1500);
+    setTimeout(initEnvelopeAnimation,50);
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
+/*
+  ABERTURA CINEMATOGRÁFICA — única implementação.
+  0-3s preto
+  3-8s primeira frase
+  8-13s preto
+  13-18s segunda frase
+  18-23s preto
+  23-28s terceira frase
+  28-38s suspense
+  38s revelação da Alice
+*/
 (function(){
-  function startIntro(){
+  function restartAliceAnimation(){
+    const section=document.getElementById('alice'), stage=document.querySelector('.aliceStage');
+    if(!section||!stage)return;
+    const img=stage.querySelector('.aliceArt'), light=stage.querySelector('.aliceLight');
+    if(img){img.style.display='block';img.style.animation='none';void img.offsetWidth;img.style.animation='aliceReveal 5.2s ease-in-out both';}
+    if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}
+  }
+
+  function start(){
     if(document.getElementById('cinematicIntro'))return;
     const css=document.createElement('style');
     css.textContent='#cinematicIntro{position:fixed;inset:0;background:#000;color:#f4ead5;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px}.cinematicText{font-family:Georgia,"Times New Roman",serif;font-size:clamp(25px,6vw,48px);line-height:1.3;max-width:850px;opacity:0;transition:opacity .4s ease}.cinematicText.show{opacity:1}';
@@ -32,30 +102,7 @@ window.AliceDB = null;
     const first='Uma pequena história está prestes a começar...';
     const second='Tem alguém muito especial esperando para conhecer vocês...';
     const third='Agora fiquem com a surpresa...';
-    const at=(ms,fn)=>setTimeout(fn,ms);
-    const showText=value=>{text.textContent=value;text.classList.add('show');};
-    const hideText=()=>text.classList.remove('show');
-    at(3000,()=>showText(first));
-    at(8000,hideText);
-    at(13000,()=>showText(second));
-    at(18000,hideText);
-    at(23000,()=>showText(third));
-    at(28000,hideText);
-    at(38000,()=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const alice=document.getElementById('alice');if(alice)alice.classList.add('on');restartAliceAnimationDirect();overlay.remove();});
-  }
-  function restartAliceAnimationDirect(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startIntro);else startIntro();
-})();
-
-(function(){
-  function run(){
-    const overlay=document.getElementById('cinematicIntro');
-    if(!overlay)return;
-    const text=overlay.querySelector('.cinematicText');
     const started=performance.now();
-    const first='Uma pequena história está prestes a começar...';
-    const second='Tem alguém muito especial esperando para conhecer vocês...';
-    const third='Agora fiquem com a surpresa...';
     function tick(){
       const t=(performance.now()-started)/1000;
       if(t<3){text.classList.remove('show');}
@@ -65,45 +112,62 @@ window.AliceDB = null;
       else if(t<23){text.classList.remove('show');}
       else if(t<28){text.textContent=third;text.classList.add('show');}
       else if(t<38){text.classList.remove('show');}
-      else{document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const alice=document.getElementById('alice');if(alice)alice.classList.add('on');restartAliceAnimationDirectFinal();overlay.remove();return;}
+      else{
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+        const alice=document.getElementById('alice');if(alice)alice.classList.add('on');
+        overlay.remove();
+        restartAliceAnimation();
+        return;
+      }
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
   }
-  function restartAliceAnimationDirectFinal(){const section=document.getElementById('alice'),stage=document.querySelector('.aliceStage');if(!section||!stage)return;const old=stage.querySelector('.aliceArt'),light=stage.querySelector('.aliceLight');if(old){old.style.display='block';old.style.animation='none';void old.offsetWidth;old.style.animation='aliceReveal 5.2s ease-in-out both';}if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 
-// Corrige somente a arte da Alice: usa o JPG escolhido e remove automaticamente o fundo azul conectado às bordas, preservando a arte.
+/*
+  ÚNICO tratamento da arte da Alice.
+  Usa somente IMG-20260919-WA0107.jpg e remove o fundo conectado às bordas.
+*/
 (function(){
   function prepareAlice(){
     const img=document.querySelector('.aliceArt');
-    if(!img)return;
+    if(!img||img.dataset.cleaned==='1')return;
+    img.dataset.cleaned='1';
     const src='IMG-20260919-WA0107.jpg?v=20260925';
-    if(!img.dataset.bgFixed){
-      img.dataset.bgFixed='1';
-      img.src=src;
-      const process=()=>{
-        try{
-          const w=img.naturalWidth,h=img.naturalHeight;
-          if(!w||!h)return;
-          const c=document.createElement('canvas');c.width=w;c.height=h;
-          const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);
-          const d=x.getImageData(0,0,w,h),p=d.data;
-          const pts=[[1,1],[w-2,1],[1,h-2],[w-2,h-2],[Math.floor(w*.08),Math.floor(h*.08)],[Math.floor(w*.92),Math.floor(h*.08)],[Math.floor(w*.08),Math.floor(h*.92)],[Math.floor(w*.92),Math.floor(h*.92)]];
-          let br=0,bg=0,bb=0;pts.forEach(([px,py])=>{const i=(py*w+px)*4;br+=p[i];bg+=p[i+1];bb+=p[i+2];});br/=pts.length;bg/=pts.length;bb/=pts.length;
-          const pass=new Uint8Array(w*h),seen=new Uint8Array(w*h),q=[];
-          function similar(i){const r=p[i*4],g=p[i*4+1],b=p[i*4+2],lum=.2126*r+.7152*g+.0722*b;const dist=Math.hypot(r-br,g-bg,b-bb);return dist<62&&b>=r*.95&&b>=g*.88&&lum<150;}
-          for(let y=0;y<h;y++){for(let xx=0;xx<w;xx++){if(y===0||xx===0||y===h-1||xx===w-1){const k=y*w+xx;if(similar(k)&&!seen[k]){seen[k]=1;q.push(k);}}}}
-          for(let qi=0;qi<q.length;qi++){const k=q[qi],xx=k%w,y=Math.floor(k/w);pass[k]=1;const ns=[];if(xx>0)ns.push(k-1);if(xx<w-1)ns.push(k+1);if(y>0)ns.push(k-w);if(y<h-1)ns.push(k+w);for(const n of ns){if(!seen[n]&&similar(n)){seen[n]=1;q.push(n);}}}
-          for(let k=0;k<w*h;k++)if(pass[k])p[k*4+3]=0;
-          x.putImageData(d,0,0);
-          img.src=c.toDataURL('image/png');
-          img.style.mixBlendMode='normal';
-        }catch(e){img.style.mixBlendMode='screen';}
-      };
-      if(img.complete)process();else img.addEventListener('load',process,{once:true});
-    }
+    img.src=src;
+
+    const process=function(){
+      try{
+        const w=img.naturalWidth,h=img.naturalHeight;
+        if(!w||!h)return;
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+        const data=ctx.getImageData(0,0,w,h),p=data.data;
+        const samples=[];
+        [[0,0],[w-1,0],[0,h-1],[w-1,h-1],[Math.floor(w*.04),Math.floor(h*.04)],[Math.floor(w*.96),Math.floor(h*.04)],[Math.floor(w*.04),Math.floor(h*.96)],[Math.floor(w*.96),Math.floor(h*.96)]].forEach(([x,y])=>{const i=(y*w+x)*4;samples.push([p[i],p[i+1],p[i+2]]);});
+        let br=0,bg=0,bb=0;samples.forEach(s=>{br+=s[0];bg+=s[1];bb+=s[2]});br/=samples.length;bg/=samples.length;bb/=samples.length;
+        const seen=new Uint8Array(w*h),queue=[];
+        const similar=function(k){const i=k*4,r=p[i],g=p[i+1],b=p[i+2];return Math.hypot(r-br,g-bg,b-bb)<88;};
+        for(let x=0;x<w;x++){const a=x,b=(h-1)*w+x;if(similar(a)){seen[a]=1;queue.push(a)}if(similar(b)){seen[b]=1;queue.push(b)}}
+        for(let y=1;y<h-1;y++){const a=y*w,b=a+w-1;if(similar(a)){seen[a]=1;queue.push(a)}if(similar(b)){seen[b]=1;queue.push(b)}}
+        for(let q=0;q<queue.length;q++){
+          const k=queue[q],x=k%w,y=Math.floor(k/w),i=k*4;p[i+3]=0;
+          if(x>0){const n=k-1;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
+          if(x<w-1){const n=k+1;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
+          if(y>0){const n=k-w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
+          if(y<h-1){const n=k+w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
+        }
+        ctx.putImageData(data,0,0);
+        img.src=canvas.toDataURL('image/png');
+        img.style.mixBlendMode='normal';
+      }catch(e){
+        // Se o navegador bloquear o processamento, mantém a imagem original sem quebrar a página.
+        img.style.mixBlendMode='screen';
+      }
+    };
+    if(img.complete)process();else img.addEventListener('load',process,{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
