@@ -212,3 +212,11 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
+
+(function(){
+  function removeAliceSubtitle(){
+    const subtitle=document.querySelector('.aliceStage .sub');
+    if(subtitle)subtitle.remove();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeAliceSubtitle);else removeAliceSubtitle();
+})();
