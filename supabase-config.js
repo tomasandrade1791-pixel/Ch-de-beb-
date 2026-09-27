@@ -24,6 +24,17 @@ window.AliceDB = null;
     target.classList.add('on');
   }
 
+  function showRulesWhenReady(){
+    forceView('rules');
+    if(typeof window.renderRule==='function'){
+      try{window.renderRule();}catch(e){}
+    }
+    const rp=document.getElementById('rp');
+    if(rp && !rp.innerHTML.trim()){
+      rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p>';
+    }
+  }
+
   function initEnvelopeAnimation(){
     const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
@@ -59,6 +70,8 @@ window.AliceDB = null;
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}55%{opacity:.95;transform:scale(1.025) rotate(-.4deg)}100%{opacity:0;transform:scale(1.055) rotate(-1deg)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}45%{clip-path:inset(35% 0 0 0);opacity:1;transform:translateY(1%) scale(.985)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
       @keyframes tapOut{to{opacity:0;visibility:hidden}}
+      .rulesBridge{position:fixed;left:-10px;top:-10px;width:1px;height:1px;opacity:0;pointer-events:none;transition:opacity 1.35s linear}
+      .rulesBridge.go{opacity:1}
     `;
     document.head.appendChild(style);
 
@@ -69,14 +82,18 @@ window.AliceDB = null;
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
 
-      // Nova estratégia: não usamos timer nem a etapa paperReveal.
-      // A próxima tela só é chamada quando a animação da cartinha aberta
-      // realmente terminar.
-      const finish=function(ev){
-        if(ev.animationName!=='envelopeOpenIn')return;
-        forceView('rules');
-      };
-      open.addEventListener('animationend',finish,{once:true});
+      // A passagem para os combinados usa um elemento independente.
+      // Assim ela não depende do evento animationend da imagem aberta.
+      const bridge=document.createElement('span');
+      bridge.className='rulesBridge';
+      document.body.appendChild(bridge);
+      bridge.addEventListener('transitionend',function(ev){
+        if(ev.propertyName!=='opacity')return;
+        bridge.remove();
+        showRulesWhenReady();
+      },{once:true});
+      void bridge.offsetWidth;
+      bridge.classList.add('go');
     },true);
   }
 
