@@ -18,6 +18,13 @@ window.AliceDB = null;
     }
   }
 
+  function forceView(id){
+    const target=document.getElementById(id);
+    if(!target)return;
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+    target.classList.add('on');
+  }
+
   function initEnvelopeAnimation(){
     const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
@@ -63,8 +70,8 @@ window.AliceDB = null;
       card.dataset.realOpened='1';
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
-      setTimeout(function(){if(typeof show==='function')show('paperReveal')},1450);
-      setTimeout(function(){if(typeof show==='function')show('rules')},2950);
+      setTimeout(function(){forceView('paperReveal')},1450);
+      setTimeout(function(){forceView('rules')},2950);
     },true);
   }
 
