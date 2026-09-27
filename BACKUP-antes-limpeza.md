@@ -1,0 +1,1 @@
+Backup lógico antes da limpeza dos controladores da cartinha. Estado preservado na branch restauracao-base-estavel antes desta alteração.
