@@ -2,7 +2,6 @@
 window.AliceDB = null;
 
 (function(){
-  // Ajustes da cartinha e da introdução das regras. Não interfere na abertura cinematográfica.
   function fixEnvelopeStage(){
     const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen');
     if(closed){
@@ -32,7 +31,6 @@ window.AliceDB = null;
 
     const style=document.createElement('style');
     style.textContent=`
-      /* Um único quadro físico para as duas artes: 3:2, igual à cartinha fechada. */
       .envCard{
         position:relative!important;
         width:min(88vw,620px)!important;
@@ -70,8 +68,15 @@ window.AliceDB = null;
       card.dataset.realOpened='1';
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
-      setTimeout(function(){forceView('paperReveal')},1450);
-      setTimeout(function(){forceView('rules')},2950);
+
+      // Nova estratégia: não usamos timer nem a etapa paperReveal.
+      // A próxima tela só é chamada quando a animação da cartinha aberta
+      // realmente terminar.
+      const finish=function(ev){
+        if(ev.animationName!=='envelopeOpenIn')return;
+        forceView('rules');
+      };
+      open.addEventListener('animationend',finish,{once:true});
     },true);
   }
 
@@ -106,17 +111,6 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/*
-  ABERTURA CINEMATOGRÁFICA — única implementação.
-  0-3s preto
-  3-8s primeira frase
-  8-13s preto
-  13-18s segunda frase
-  18-23s preto
-  23-28s terceira frase
-  28-38s suspense
-  38s revelação da Alice
-*/
 (function(){
   function restartAliceAnimation(){
     const section=document.getElementById('alice'), stage=document.querySelector('.aliceStage');
@@ -160,10 +154,6 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 
-/*
-  ÚNICO tratamento da arte da Alice.
-  Usa somente IMG-20260919-WA0107.jpg e remove o fundo conectado às bordas.
-*/
 (function(){
   function prepareAlice(){
     const img=document.querySelector('.aliceArt');
@@ -171,7 +161,6 @@ window.AliceDB = null;
     img.dataset.cleaned='1';
     const src='IMG-20260919-WA0107.jpg?v=20260925';
     img.src=src;
-
     const process=function(){
       try{
         const w=img.naturalWidth,h=img.naturalHeight;
@@ -193,19 +182,14 @@ window.AliceDB = null;
           if(y>0){const n=k-w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
           if(y<h-1){const n=k+w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
         }
-        ctx.putImageData(data,0,0);
-        img.src=canvas.toDataURL('image/png');
-        img.style.mixBlendMode='normal';
-      }catch(e){
-        img.style.mixBlendMode='screen';
-      }
+        ctx.putImageData(data,0,0);img.src=canvas.toDataURL('image/png');img.style.mixBlendMode='normal';
+      }catch(e){img.style.mixBlendMode='screen';}
     };
     if(img.complete)process();else img.addEventListener('load',process,{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
 
-/* TRANSIÇÃO ALICE -> CARTINHA FECHADA. */
 (function(){
   function initAliceToEnvelope(){
     const alice=document.getElementById('alice');
