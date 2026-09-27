@@ -1,0 +1,37 @@
+name: Ajuste único do fundo dos Combinados
+
+on:
+  push:
+    branches:
+      - restauracao-base-estavel
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'Ajusta fundo dos Combinados para IMG-20260919-WA0102'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trocar somente o fundo dos Combinados
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0107.jpg?v=20260921"
+          new = "IMG-20260919-WA0102.jpg?v=20260927"
+          if old not in s:
+              raise SystemExit('Fundo atual dos Combinados não encontrado; nenhuma alteração feita.')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Salvar e remover arquivo temporário
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+users.noreply.github.com"
+          rm -f .github/workflows/one-time-rules-bg-fix.yml
+          git add index.html .github/workflows/one-time-rules-bg-fix.yml
+          git diff --cached --check
+          git commit -m "Ajusta fundo dos Combinados para IMG-20260919-WA0102"
+          git push origin restauracao-base-estavel
