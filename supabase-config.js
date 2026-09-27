@@ -82,8 +82,6 @@ window.AliceDB = null;
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
 
-      // A passagem para os combinados usa um elemento independente.
-      // Assim ela não depende do evento animationend da imagem aberta.
       const bridge=document.createElement('span');
       bridge.className='rulesBridge';
       document.body.appendChild(bridge);
@@ -158,7 +156,7 @@ window.AliceDB = null;
       else if(t<28){text.textContent=third;text.classList.add('show');}
       else if(t<38){text.classList.remove('show');}
       else{
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         const alice=document.getElementById('alice');if(alice)alice.classList.add('on');
         overlay.remove();
         restartAliceAnimation();
@@ -236,4 +234,57 @@ window.AliceDB = null;
     if(subtitle)subtitle.remove();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeAliceSubtitle);else removeAliceSubtitle();
+})();
+
+/* AJUSTE FINAL COMBINADOS: texto escuro, centralizado e protegido da moldura */
+(function(){
+  function applyRulesTextFix(){
+    if(document.getElementById('rulesTextFix'))return;
+    const style=document.createElement('style');
+    style.id='rulesTextFix';
+    style.textContent=`
+      .rulesPaper{
+        padding-top:110px!important;
+        padding-left:68px!important;
+        padding-right:68px!important;
+        padding-bottom:140px!important;
+      }
+      .rulesPaper h1,
+      .rulesPaper .intro,
+      .rulesPaper .ruleTitle,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail{
+        width:100%!important;
+        max-width:470px!important;
+        margin-left:auto!important;
+        margin-right:auto!important;
+      }
+      .rulesPaper h1,
+      .rulesPaper .ruleTitle,
+      .rulesPaper .intro,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail,
+      .rulesPaper .detail b{
+        color:#1c2f49!important;
+      }
+      .rulesPaper .intro,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail{
+        text-shadow:0 1px 0 rgba(255,255,255,.18)!important;
+      }
+      .rulesPaper .nav{z-index:10!important}
+      @media(max-width:650px){
+        .rulesPaper{
+          padding-top:105px!important;
+          padding-left:58px!important;
+          padding-right:58px!important;
+          padding-bottom:135px!important;
+        }
+        .rulesPaper h1,.rulesPaper .ruleTitle{font-size:clamp(25px,6.5vw,38px)!important;line-height:1.18!important}
+        .rulesPaper .intro,.rulesPaper .ruleBody{font-size:16px!important;line-height:1.65!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyRulesTextFix);else applyRulesTextFix();
 })();
