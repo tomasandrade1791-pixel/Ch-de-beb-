@@ -2,6 +2,7 @@
 window.AliceDB = null;
 
 (function(){
+  // Ajustes da cartinha e da introdução das regras. Não interfere na abertura cinematográfica.
   function fixEnvelopeStage(){
     const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen');
     if(closed){
@@ -28,10 +29,31 @@ window.AliceDB = null;
     const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
     card.dataset.openAnimationReady='1';
+
     const style=document.createElement('style');
     style.textContent=`
-      .envCard{position:relative!important;width:min(88vw,620px)!important;aspect-ratio:3 / 2!important;height:auto!important;min-height:0!important;margin:0 auto!important;display:block!important;overflow:visible!important}
-      .envCard img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;object-fit:fill!important;filter:drop-shadow(0 25px 40px #000)}
+      /* Um único quadro físico para as duas artes: 3:2, igual à cartinha fechada. */
+      .envCard{
+        position:relative!important;
+        width:min(88vw,620px)!important;
+        aspect-ratio:3 / 2!important;
+        height:auto!important;
+        min-height:0!important;
+        margin:0 auto!important;
+        display:block!important;
+        overflow:visible!important;
+      }
+      .envCard img{
+        position:absolute!important;
+        inset:0!important;
+        width:100%!important;
+        height:100%!important;
+        max-width:none!important;
+        max-height:none!important;
+        margin:0!important;
+        object-fit:fill!important;
+        filter:drop-shadow(0 25px 40px #000);
+      }
       .envCard.realOpening{overflow:visible!important}
       .envCard.realOpening #envClosed{animation:envelopeClosedOut .72s cubic-bezier(.55,.05,.68,.19) forwards!important}
       .envCard.realOpening #envOpen{animation:envelopeOpenIn 1.15s cubic-bezier(.2,.75,.2,1) .08s forwards!important;clip-path:inset(100% 0 0 0);opacity:1!important;transform:translateY(7%) scale(.94)!important;filter:drop-shadow(0 0 0 rgba(215,184,106,0))!important}
@@ -41,6 +63,7 @@ window.AliceDB = null;
       @keyframes tapOut{to{opacity:0;visibility:hidden}}
     `;
     document.head.appendChild(style);
+
     card.addEventListener('click',function(e){
       if(card.dataset.realOpened)return;
       e.preventDefault();e.stopImmediatePropagation();
@@ -83,7 +106,17 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* ABERTURA CINEMATOGRÁFICA — única implementação. */
+/*
+  ABERTURA CINEMATOGRÁFICA — única implementação.
+  0-3s preto
+  3-8s primeira frase
+  8-13s preto
+  13-18s segunda frase
+  18-23s preto
+  23-28s terceira frase
+  28-38s suspense
+  38s revelação da Alice
+*/
 (function(){
   function restartAliceAnimation(){
     const section=document.getElementById('alice'), stage=document.querySelector('.aliceStage');
@@ -92,6 +125,7 @@ window.AliceDB = null;
     if(img){img.style.display='block';img.style.animation='none';void img.offsetWidth;img.style.animation='aliceReveal 5.2s ease-in-out both';}
     if(light){light.style.display='block';light.style.animation='none';void light.offsetWidth;light.style.animation='navyLight 5.2s ease-in-out both';}
   }
+
   function start(){
     if(document.getElementById('cinematicIntro'))return;
     const css=document.createElement('style');
@@ -126,7 +160,10 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 
-/* ÚNICO tratamento da arte da Alice. */
+/*
+  ÚNICO tratamento da arte da Alice.
+  Usa somente IMG-20260919-WA0107.jpg e remove o fundo conectado às bordas.
+*/
 (function(){
   function prepareAlice(){
     const img=document.querySelector('.aliceArt');
@@ -134,6 +171,7 @@ window.AliceDB = null;
     img.dataset.cleaned='1';
     const src='IMG-20260919-WA0107.jpg?v=20260925';
     img.src=src;
+
     const process=function(){
       try{
         const w=img.naturalWidth,h=img.naturalHeight;
@@ -155,47 +193,38 @@ window.AliceDB = null;
           if(y>0){const n=k-w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
           if(y<h-1){const n=k+w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
         }
-        ctx.putImageData(data,0,0);img.src=canvas.toDataURL('image/png');img.style.mixBlendMode='normal';
-      }catch(e){img.style.mixBlendMode='screen';}
+        ctx.putImageData(data,0,0);
+        img.src=canvas.toDataURL('image/png');
+        img.style.mixBlendMode='normal';
+      }catch(e){
+        img.style.mixBlendMode='screen';
+      }
     };
     if(img.complete)process();else img.addEventListener('load',process,{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
 
-/* TRANSIÇÃO ALICE -> CARTINHA FECHADA — temporizador único e determinístico. */
+/* TRANSIÇÃO ALICE -> CARTINHA FECHADA. */
 (function(){
   function initAliceToEnvelope(){
     const alice=document.getElementById('alice');
     const env=document.getElementById('env');
     if(!alice||!env||alice.dataset.envelopeTransitionReady)return;
     alice.dataset.envelopeTransitionReady='1';
-    let timer=null;
-    function resetEnvelope(){
-      const card=document.getElementById('envCard');
-      const closed=document.getElementById('envClosed');
-      const open=document.getElementById('envOpen');
-      const tap=document.getElementById('tapText');
-      if(card){card.classList.remove('realOpening');delete card.dataset.realOpened;}
-      if(closed){closed.style.opacity='1';closed.style.transform='none';}
-      if(open){open.style.opacity='0';open.style.transform='scale(.94)';}
-      if(tap){tap.style.opacity='1';tap.style.visibility='visible';tap.style.pointerEvents='auto';}
-    }
+    let scheduled=false;
     function goToEnvelope(){
-      if(timer)clearTimeout(timer);
-      timer=setTimeout(function(){
+      if(scheduled)return;
+      scheduled=true;
+      setTimeout(function(){
         if(!alice.classList.contains('on'))return;
-        resetEnvelope();
         document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         env.classList.add('on');
-      },5400);
+      },6500);
     }
-    function watch(){
-      if(alice.classList.contains('on'))goToEnvelope();
-    }
-    const observer=new MutationObserver(watch);
+    const observer=new MutationObserver(function(){if(alice.classList.contains('on'))goToEnvelope();});
     observer.observe(alice,{attributes:true,attributeFilter:['class']});
-    watch();
+    if(alice.classList.contains('on'))goToEnvelope();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
