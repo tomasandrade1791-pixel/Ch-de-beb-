@@ -82,8 +82,6 @@ window.AliceDB = null;
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
 
-      // A passagem para os combinados usa um elemento independente.
-      // Assim ela não depende do evento animationend da imagem aberta.
       const bridge=document.createElement('span');
       bridge.className='rulesBridge';
       document.body.appendChild(bridge);
@@ -158,7 +156,7 @@ window.AliceDB = null;
       else if(t<28){text.textContent=third;text.classList.add('show');}
       else if(t<38){text.classList.remove('show');}
       else{
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         const alice=document.getElementById('alice');if(alice)alice.classList.add('on');
         overlay.remove();
         restartAliceAnimation();
@@ -242,7 +240,6 @@ window.AliceDB = null;
   function styleRulesText(){
     const style=document.createElement('style');
     style.textContent=`
-      /* Área segura para o texto dos Combinados: fica entre os ornamentos laterais. */
       #rp > *{
         position:relative!important;
         z-index:2!important;
@@ -276,6 +273,7 @@ window.AliceDB = null;
       @media(max-width:650px){
         #rp > *{width:calc(100% - 56px)!important;}
         #rp h1{font-size:clamp(28px,7vw,40px)!important;}
+        #rp{padding-top:190px!important;}
       }
     `;
     document.head.appendChild(style);
