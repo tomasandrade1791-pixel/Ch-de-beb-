@@ -2,7 +2,6 @@
 window.AliceDB = null;
 
 (function(){
-  // Ajustes da cartinha e da introdução das regras. Não interfere na abertura cinematográfica.
   function fixEnvelopeStage(){
     const closed=document.getElementById('envClosed'), tap=document.getElementById('tapText'), open=document.getElementById('envOpen');
     if(closed){
@@ -25,6 +24,17 @@ window.AliceDB = null;
     target.classList.add('on');
   }
 
+  function showRulesWhenReady(){
+    forceView('rules');
+    if(typeof window.renderRule==='function'){
+      try{window.renderRule();}catch(e){}
+    }
+    const rp=document.getElementById('rp');
+    if(rp && !rp.innerHTML.trim()){
+      rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p>';
+    }
+  }
+
   function initEnvelopeAnimation(){
     const card=document.getElementById('envCard'),closed=document.getElementById('envClosed'),open=document.getElementById('envOpen'),tap=document.getElementById('tapText');
     if(!card||!closed||!open||card.dataset.openAnimationReady)return;
@@ -32,7 +42,6 @@ window.AliceDB = null;
 
     const style=document.createElement('style');
     style.textContent=`
-      /* Um único quadro físico para as duas artes: 3:2, igual à cartinha fechada. */
       .envCard{
         position:relative!important;
         width:min(88vw,620px)!important;
@@ -61,6 +70,8 @@ window.AliceDB = null;
       @keyframes envelopeClosedOut{0%{opacity:1;transform:scale(1) rotate(0)}55%{opacity:.95;transform:scale(1.025) rotate(-.4deg)}100%{opacity:0;transform:scale(1.055) rotate(-1deg)}}
       @keyframes envelopeOpenIn{0%{clip-path:inset(100% 0 0 0);opacity:1;transform:translateY(7%) scale(.94)}45%{clip-path:inset(35% 0 0 0);opacity:1;transform:translateY(1%) scale(.985)}100%{clip-path:inset(0 0 0 0);opacity:1;transform:translateY(0) scale(1)}}
       @keyframes tapOut{to{opacity:0;visibility:hidden}}
+      .rulesBridge{position:fixed;left:-10px;top:-10px;width:1px;height:1px;opacity:0;pointer-events:none;transition:opacity 1.35s linear}
+      .rulesBridge.go{opacity:1}
     `;
     document.head.appendChild(style);
 
@@ -70,8 +81,17 @@ window.AliceDB = null;
       card.dataset.realOpened='1';
       tap.style.pointerEvents='none';
       card.classList.add('realOpening');
-      setTimeout(function(){forceView('paperReveal')},1450);
-      setTimeout(function(){forceView('rules')},2950);
+
+      const bridge=document.createElement('span');
+      bridge.className='rulesBridge';
+      document.body.appendChild(bridge);
+      bridge.addEventListener('transitionend',function(ev){
+        if(ev.propertyName!=='opacity')return;
+        bridge.remove();
+        showRulesWhenReady();
+      },{once:true});
+      void bridge.offsetWidth;
+      bridge.classList.add('go');
     },true);
   }
 
@@ -106,17 +126,6 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/*
-  ABERTURA CINEMATOGRÁFICA — única implementação.
-  0-3s preto
-  3-8s primeira frase
-  8-13s preto
-  13-18s segunda frase
-  18-23s preto
-  23-28s terceira frase
-  28-38s suspense
-  38s revelação da Alice
-*/
 (function(){
   function restartAliceAnimation(){
     const section=document.getElementById('alice'), stage=document.querySelector('.aliceStage');
@@ -147,7 +156,7 @@ window.AliceDB = null;
       else if(t<28){text.textContent=third;text.classList.add('show');}
       else if(t<38){text.classList.remove('show');}
       else{
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         const alice=document.getElementById('alice');if(alice)alice.classList.add('on');
         overlay.remove();
         restartAliceAnimation();
@@ -160,10 +169,6 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 
-/*
-  ÚNICO tratamento da arte da Alice.
-  Usa somente IMG-20260919-WA0107.jpg e remove o fundo conectado às bordas.
-*/
 (function(){
   function prepareAlice(){
     const img=document.querySelector('.aliceArt');
@@ -171,7 +176,6 @@ window.AliceDB = null;
     img.dataset.cleaned='1';
     const src='IMG-20260919-WA0107.jpg?v=20260925';
     img.src=src;
-
     const process=function(){
       try{
         const w=img.naturalWidth,h=img.naturalHeight;
@@ -193,19 +197,14 @@ window.AliceDB = null;
           if(y>0){const n=k-w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
           if(y<h-1){const n=k+w;if(!seen[n]&&similar(n)){seen[n]=1;queue.push(n)}}
         }
-        ctx.putImageData(data,0,0);
-        img.src=canvas.toDataURL('image/png');
-        img.style.mixBlendMode='normal';
-      }catch(e){
-        img.style.mixBlendMode='screen';
-      }
+        ctx.putImageData(data,0,0);img.src=canvas.toDataURL('image/png');img.style.mixBlendMode='normal';
+      }catch(e){img.style.mixBlendMode='screen';}
     };
     if(img.complete)process();else img.addEventListener('load',process,{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAlice);else prepareAlice();
 })();
 
-/* TRANSIÇÃO ALICE -> CARTINHA FECHADA. */
 (function(){
   function initAliceToEnvelope(){
     const alice=document.getElementById('alice');
@@ -227,4 +226,65 @@ window.AliceDB = null;
     if(alice.classList.contains('on'))goToEnvelope();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
+})();
+
+(function(){
+  function removeAliceSubtitle(){
+    const subtitle=document.querySelector('.aliceStage .sub');
+    if(subtitle)subtitle.remove();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeAliceSubtitle);else removeAliceSubtitle();
+})();
+
+/* AJUSTE FINAL COMBINADOS: texto escuro, centralizado e protegido da moldura */
+(function(){
+  function applyRulesTextFix(){
+    if(document.getElementById('rulesTextFix'))return;
+    const style=document.createElement('style');
+    style.id='rulesTextFix';
+    style.textContent=`
+      .rulesPaper{
+        padding-top:110px!important;
+        padding-left:68px!important;
+        padding-right:68px!important;
+        padding-bottom:140px!important;
+      }
+      .rulesPaper h1,
+      .rulesPaper .intro,
+      .rulesPaper .ruleTitle,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail{
+        width:100%!important;
+        max-width:470px!important;
+        margin-left:auto!important;
+        margin-right:auto!important;
+      }
+      .rulesPaper h1,
+      .rulesPaper .ruleTitle,
+      .rulesPaper .intro,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail,
+      .rulesPaper .detail b{
+        color:#1c2f49!important;
+      }
+      .rulesPaper .intro,
+      .rulesPaper .ruleBody,
+      .rulesPaper .detail{
+        text-shadow:0 1px 0 rgba(255,255,255,.18)!important;
+      }
+      .rulesPaper .nav{z-index:10!important}
+      @media(max-width:650px){
+        .rulesPaper{
+          padding-top:105px!important;
+          padding-left:58px!important;
+          padding-right:58px!important;
+          padding-bottom:135px!important;
+        }
+        .rulesPaper h1,.rulesPaper .ruleTitle{font-size:clamp(25px,6.5vw,38px)!important;line-height:1.18!important}
+        .rulesPaper .intro,.rulesPaper .ruleBody{font-size:16px!important;line-height:1.65!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyRulesTextFix);else applyRulesTextFix();
 })();
