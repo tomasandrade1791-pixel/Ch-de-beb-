@@ -308,3 +308,29 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
+
+/* Correção de segurança: garante que a tela da Alice avance para a cartinha mesmo se outro temporizador do convite interferir. */
+(function(){
+  function installAliceWatch(){
+    const alice=document.getElementById('alice');
+    const env=document.getElementById('env');
+    if(!alice||!env)return;
+    let timer=null;
+    function schedule(){
+      if(timer)clearTimeout(timer);
+      timer=setTimeout(function(){
+        timer=null;
+        if(!alice.classList.contains('on'))return;
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+        env.classList.add('on');
+      },5600);
+    }
+    const observer=new MutationObserver(function(){
+      if(alice.classList.contains('on'))schedule();
+      else if(timer){clearTimeout(timer);timer=null;}
+    });
+    observer.observe(alice,{attributes:true,attributeFilter:['class']});
+    if(alice.classList.contains('on'))schedule();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installAliceWatch);else installAliceWatch();
+})();
