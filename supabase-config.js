@@ -280,3 +280,31 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',styleRulesText);else styleRulesText();
 })();
+
+(function(){
+  function installRulesNavigation(){
+    const rules=document.getElementById('rules');
+    const rp=document.getElementById('rp');
+    if(!rules||!rp||!rules.classList.contains('on'))return;
+    let nav=document.getElementById('rulesNavFix');
+    if(!nav){
+      nav=document.createElement('div');
+      nav.id='rulesNavFix';
+      nav.className='nav';
+      nav.innerHTML='<button class="btn" id="rulesBackFix">‹ VOLTAR</button><span class="counter" id="rulesCounterFix">INTRODUÇÃO</span><button class="btn" id="rulesNextFix">PRÓXIMO ›</button>';
+      rules.appendChild(nav);
+    }
+    const back=document.getElementById('rulesBackFix');
+    const next=document.getElementById('rulesNextFix');
+    if(back)back.onclick=function(){if(typeof window.prev==='function')window.prev();};
+    if(next)next.onclick=function(){if(typeof window.next==='function')window.next();};
+    nav.style.display='flex';
+  }
+  function start(){
+    installRulesNavigation();
+    const observer=new MutationObserver(installRulesNavigation);
+    observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+    setInterval(installRulesNavigation,500);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
