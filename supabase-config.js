@@ -211,19 +211,32 @@ window.AliceDB = null;
     const env=document.getElementById('env');
     if(!alice||!env||alice.dataset.envelopeTransitionReady)return;
     alice.dataset.envelopeTransitionReady='1';
-    let scheduled=false;
+    let timer=null;
+    function resetEnvelope(){
+      const card=document.getElementById('envCard');
+      const closed=document.getElementById('envClosed');
+      const open=document.getElementById('envOpen');
+      const tap=document.getElementById('tapText');
+      if(card){card.classList.remove('realOpening');delete card.dataset.realOpened;}
+      if(closed){closed.style.opacity='1';closed.style.transform='none';}
+      if(open){open.style.opacity='0';open.style.transform='scale(.94)';}
+      if(tap){tap.style.opacity='1';tap.style.visibility='visible';tap.style.pointerEvents='auto';}
+    }
     function goToEnvelope(){
-      if(scheduled)return;
-      scheduled=true;
-      setTimeout(function(){
+      if(timer)clearTimeout(timer);
+      timer=setTimeout(function(){
         if(!alice.classList.contains('on'))return;
+        resetEnvelope();
         document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
         env.classList.add('on');
-      },6500);
+      },5400);
     }
-    const observer=new MutationObserver(function(){if(alice.classList.contains('on'))goToEnvelope();});
+    function watch(){
+      if(alice.classList.contains('on'))goToEnvelope();
+    }
+    const observer=new MutationObserver(watch);
     observer.observe(alice,{attributes:true,attributeFilter:['class']});
-    if(alice.classList.contains('on'))goToEnvelope();
+    watch();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
@@ -281,7 +294,6 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',styleRulesText);else styleRulesText();
 })();
 
-/* Mantém o fundo floral dos Combinados, sem alterar o conteúdo ou a cor das letras. */
 (function(){
   function fixRulesBackground(){
     const style=document.createElement('style');
