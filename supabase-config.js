@@ -281,56 +281,12 @@ window.AliceDB = null;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',styleRulesText);else styleRulesText();
 })();
 
+/* Mantém o fundo floral dos Combinados, sem alterar o conteúdo ou a cor das letras. */
 (function(){
-  function installRulesNavigation(){
-    const rules=document.getElementById('rules');
-    const rp=document.getElementById('rp');
-    if(!rules||!rp||!rules.classList.contains('on'))return;
-    let nav=document.getElementById('rulesNavFix');
-    if(!nav){
-      nav=document.createElement('div');
-      nav.id='rulesNavFix';
-      nav.className='nav';
-      nav.innerHTML='<button class="btn" id="rulesBackFix">‹ VOLTAR</button><span class="counter" id="rulesCounterFix">INTRODUÇÃO</span><button class="btn" id="rulesNextFix">PRÓXIMO ›</button>';
-      rules.appendChild(nav);
-    }
-    const back=document.getElementById('rulesBackFix');
-    const next=document.getElementById('rulesNextFix');
-    if(back)back.onclick=function(){if(typeof window.prev==='function')window.prev();};
-    if(next)next.onclick=function(){if(typeof window.next==='function')window.next();};
-    nav.style.display='flex';
+  function fixRulesBackground(){
+    const style=document.createElement('style');
+    style.textContent=".rulesPaper{background-image:url('https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0102.jpg?v=20260928')!important;}";
+    document.head.appendChild(style);
   }
-  function start(){
-    installRulesNavigation();
-    const observer=new MutationObserver(installRulesNavigation);
-    observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
-    setInterval(installRulesNavigation,500);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();
-
-/* Correção de segurança: garante que a tela da Alice avance para a cartinha mesmo se outro temporizador do convite interferir. */
-(function(){
-  function installAliceWatch(){
-    const alice=document.getElementById('alice');
-    const env=document.getElementById('env');
-    if(!alice||!env)return;
-    let timer=null;
-    function schedule(){
-      if(timer)clearTimeout(timer);
-      timer=setTimeout(function(){
-        timer=null;
-        if(!alice.classList.contains('on'))return;
-        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
-        env.classList.add('on');
-      },5600);
-    }
-    const observer=new MutationObserver(function(){
-      if(alice.classList.contains('on'))schedule();
-      else if(timer){clearTimeout(timer);timer=null;}
-    });
-    observer.observe(alice,{attributes:true,attributeFilter:['class']});
-    if(alice.classList.contains('on'))schedule();
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installAliceWatch);else installAliceWatch();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fixRulesBackground);else fixRulesBackground();
 })();
