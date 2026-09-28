@@ -31,7 +31,7 @@ window.AliceDB = null;
     }
     const rp=document.getElementById('rp');
     if(rp && !rp.innerHTML.trim()){
-      rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com nossa família e, principalmente, com a nossa pequena. 💙🍼</p>';
+      rp.innerHTML='<h1>Combinados para o<br>⭐ nosso dia ⭐</h1><p class="intro"><strong>Queridos amigos e familiares,</strong><br>Para que possamos aproveitar esse momento tão especial com tranquilidade, carinho e alegria, preparamos alguns pequenos combinados.<br><br>Agradecemos desde já a compreensão e o carinho de todos com a nossa família e, principalmente, com a nossa pequena. 💙🍼</p>';
     }
   }
 
@@ -236,4 +236,49 @@ window.AliceDB = null;
     if(subtitle)subtitle.remove();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeAliceSubtitle);else removeAliceSubtitle();
+})();
+
+(function(){
+  function styleRulesText(){
+    const style=document.createElement('style');
+    style.textContent=`
+      /* Área segura para o texto dos Combinados: fica entre os ornamentos laterais. */
+      #rp > *{
+        position:relative!important;
+        z-index:2!important;
+        width:calc(100% - 48px)!important;
+        max-width:560px!important;
+        margin-left:auto!important;
+        margin-right:auto!important;
+        text-align:center!important;
+      }
+      #rp h1,
+      #rp .intro,
+      #rp .ruleTitle,
+      #rp .ruleBody,
+      #rp .detail,
+      #rp .detail b{
+        color:#08244a!important;
+      }
+      #rp .intro,
+      #rp .ruleBody,
+      #rp .detail{
+        line-height:1.7!important;
+      }
+      #rp h1{
+        font-weight:700!important;
+      }
+      #rp .nav{
+        width:auto!important;
+        max-width:none!important;
+        z-index:5!important;
+      }
+      @media(max-width:650px){
+        #rp > *{width:calc(100% - 56px)!important;}
+        #rp h1{font-size:clamp(28px,7vw,40px)!important;}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',styleRulesText);else styleRulesText();
 })();
