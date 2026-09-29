@@ -1,0 +1,35 @@
+name: Fix rule stars
+on:
+  push:
+    branches: [restauracao-base-estavel]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: restauracao-base-estavel
+          fetch-depth: 0
+      - name: Remove third star from rules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '<div class="ruleIcon">\'+r[0]+\'</div>'
+          if old not in s:
+              raise SystemExit('Expected rule icon markup was not found; no changes made.')
+          s = s.replace(old, '')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Remove temporary workflow and commit
+        run: |
+          rm -f .github/workflows/fix-stars.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/fix-stars.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix third star on rules"
+          git push origin HEAD:restauracao-base-estavel
