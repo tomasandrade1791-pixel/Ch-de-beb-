@@ -1,0 +1,50 @@
+name: Fix rules navigation
+
+on:
+  push:
+    branches:
+      - restauracao-base-estavel
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: restauracao-base-estavel
+          fetch-depth: 0
+      - name: Patch navigation and self-remove
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '  .nav .counter{font-size:8.5px!important}\n}\n</style>'
+          new = '  .nav .counter{font-size:8.5px!important}\n}\n/* Apenas a navegação dos combinados deve aparecer; elimina barras antigas/duplicadas. */\n.nav:not(#rulesNav){display:none!important}\n</style>'
+          if old not in s:
+              raise SystemExit('CSS anchor not found')
+          s = s.replace(old, new, 1)
+          old = "function removeNav(){document.querySelectorAll('body>.nav').forEach(n=>n.remove());}"
+          new = "function removeNav(){document.querySelectorAll('.nav').forEach(n=>n.remove());}"
+          if old not in s:
+              raise SystemExit('removeNav anchor not found')
+          s = s.replace(old, new, 1)
+          old = "rp.innerHTML='<h1>Combinados para o<br>⭐ dia da Alice ⭐</h1><div class=\"ruleTitle\">'+r[1]+'</div><div class=\"ruleBody\">'+r[2]+'</div><div class=\"nav\"><button class=\"btn\" onclick=\"prev()\">‹ VOLTAR</button><span class=\"counter\">'+String(ri+1).padStart(2,'0')+'/07</span><button class=\"btn\" onclick=\"next()\">'+(ri===rules.length-1?'CONTINUAR ›':'PRÓXIMO ›')+'</button></div>';"
+          new = "rp.innerHTML='<h1>Combinados para o<br>⭐ dia da Alice ⭐</h1><div class=\"ruleTitle\">'+r[1]+'</div><div class=\"ruleBody\">'+r[2]+'</div><div class=\"nav\" id=\"rulesNav\"><button class=\"btn\" onclick=\"prev()\">‹ VOLTAR</button><span class=\"counter\">'+String(ri+1).padStart(2,'0')+'/07</span><button class=\"btn\" onclick=\"next()\">'+(ri===rules.length-1?'CONTINUAR ›':'PRÓXIMO ›')+'</button></div>';"
+          if old not in s:
+              raise SystemExit('renderRule anchor not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Fix duplicated rules navigation'
+          rm -f .github/workflows/fix-rules-nav.yml
+          git add .github/workflows/fix-rules-nav.yml
+          git commit -m 'Remove temporary navigation fix workflow'
+          git push origin restauracao-base-estavel
