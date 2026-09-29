@@ -302,3 +302,26 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fixRulesBackground);else fixRulesBackground();
 })();
+
+/* Padronização visual dos botões: mesmo porte dos botões de navegação mostrado na referência. */
+(function(){
+  const style=document.createElement('style');
+  style.textContent=`
+    .btn{
+      min-width:140px!important;
+      height:44px!important;
+      padding:10px 16px!important;
+      font-size:13px!important;
+      line-height:1!important;
+      display:inline-flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      white-space:nowrap!important;
+    }
+    .choice .btn{
+      padding:10px 16px!important;
+      font-size:13px!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
