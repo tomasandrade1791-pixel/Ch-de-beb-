@@ -228,3 +228,73 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAliceToEnvelope);else initAliceToEnvelope();
 })();
+
+/* AJUSTES FINAIS — navegação estável dos combinados. */
+(function(){
+  function injectFinalFixes(){
+    if(document.getElementById('aliceFinalFixes'))return;
+    const style=document.createElement('style');
+    style.id='aliceFinalFixes';
+    style.textContent=`
+      /* O terceiro ⭐ é o ícone do combinado; o título já possui os dois ⭐ desejados. */
+      #rules .rulesPaper .ruleIcon{display:none!important}
+      /* Mantém a barra pequena e fixa, sem criar uma segunda barra. */
+      #rules .nav{position:fixed!important;left:50%!important;right:auto!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(88vw,560px)!important;z-index:50!important;padding:8px 10px!important;gap:8px!important;border-radius:999px!important}
+      #rules .nav .btn{padding:10px 16px!important;font-size:14px!important;line-height:1!important;min-width:0!important}
+      #rules .nav .counter{font-size:12px!important;white-space:nowrap!important}
+      #rules .rulesPaper{padding-bottom:120px!important}
+      /* Se alguma renderização antiga deixou duas barras, conserva somente a última dentro do quadro atual. */
+      #rules .rulesPaper .nav + .nav{display:none!important}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function cleanRuleNav(){
+    const rp=document.getElementById('rp');
+    if(!rp)return;
+    const bars=Array.from(rp.querySelectorAll('.nav'));
+    if(bars.length>1){bars.slice(0,-1).forEach(function(b){b.remove();});}
+  }
+
+  function stabilizeRules(){
+    injectFinalFixes();
+    cleanRuleNav();
+    const rp=document.getElementById('rp');
+    if(rp && !rp.dataset.navObserver){
+      rp.dataset.navObserver='1';
+      new MutationObserver(function(){
+        injectFinalFixes();
+        cleanRuleNav();
+      }).observe(rp,{childList:true,subtree:true});
+    }
+  }
+
+  function stabilizeAlice(){
+    const alice=document.getElementById('alice'),env=document.getElementById('env');
+    if(!alice||!env)return;
+    if(alice.classList.contains('on')){
+      if(!alice.dataset.finalAliceTimer){
+        alice.dataset.finalAliceTimer='1';
+        setTimeout(function(){
+          if(alice.classList.contains('on')){
+            document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+            env.classList.add('on');
+          }
+        },9000);
+      }
+    }else{
+      alice.dataset.finalAliceTimer='';
+    }
+  }
+
+  function boot(){
+    injectFinalFixes();
+    stabilizeRules();
+    stabilizeAlice();
+    const rules=document.getElementById('rules'),alice=document.getElementById('alice');
+    if(rules)new MutationObserver(stabilizeRules).observe(rules,{attributes:true,attributeFilter:['class']});
+    if(alice)new MutationObserver(stabilizeAlice).observe(alice,{attributes:true,attributeFilter:['class']});
+    setInterval(function(){stabilizeRules();stabilizeAlice();},1000);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
