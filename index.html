@@ -44,8 +44,6 @@
   .nav .btn{padding:6px 8px!important;font-size:9.5px!important;min-height:28px!important}
   .nav .counter{font-size:8.5px!important}
 }
-/* Apenas a navegação dos combinados deve aparecer; elimina barras antigas/duplicadas. */
-.nav:not(#rulesNav){display:none!important}
 </style>
 </head>
 <body>
@@ -75,7 +73,7 @@ const rules=[
 ];
 function removeNav(){document.querySelectorAll('.nav').forEach(n=>n.remove());}
 function show(id){removeNav();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const e=document.getElementById(id);if(e)e.classList.add('on');if(id==='rules')renderRule();}
-function renderRule(){const rp=document.getElementById('rp');if(!rp)return;const r=rules[ri];rp.innerHTML='<h1>Combinados para o<br>⭐ dia da Alice ⭐</h1><div class="ruleTitle">'+r[1]+'</div><div class="ruleBody">'+r[2]+'</div><div class="nav" id="rulesNav"><button class="btn" onclick="prev()">‹ VOLTAR</button><span class="counter">'+String(ri+1).padStart(2,'0')+'/07</span><button class="btn" onclick="next()">'+(ri===rules.length-1?'CONTINUAR ›':'PRÓXIMO ›')+'</button></div>';const nav=rp.querySelector('.nav');if(nav)document.body.appendChild(nav);}
+function renderRule(){removeNav();const rp=document.getElementById('rp');if(!rp)return;const r=rules[ri];rp.innerHTML='<h1>Combinados para o<br>⭐ dia da Alice ⭐</h1><div class="ruleTitle">'+r[1]+'</div><div class="ruleBody">'+r[2]+'</div><div class="nav" id="rulesNav"><button class="btn" onclick="prev()">‹ VOLTAR</button><span class="counter">'+String(ri+1).padStart(2,'0')+'/07</span><button class="btn" onclick="next()">'+(ri===rules.length-1?'CONTINUAR ›':'PRÓXIMO ›')+'</button></div>';const nav=rp.querySelector('.nav');if(nav)document.body.appendChild(nav);}
 function next(){if(ri<rules.length-1){ri++;renderRule();}else{show('letter');}}
 function prev(){if(ri>0){ri--;renderRule();}else{show('env');}}
 function saveGuest(){guestName=document.getElementById('gn').value.trim();if(!guestName){alert('Digite seu nome.');return;}show('confirm');}
