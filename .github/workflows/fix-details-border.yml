@@ -1,0 +1,39 @@
+name: Fix details navigation background
+
+on:
+  push:
+    branches: [restauracao-base-estavel]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: restauracao-base-estavel
+          fetch-depth: 0
+      - name: Remove the dark background behind details buttons
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '.detailsNav{position:absolute;left:50%;bottom:6.5%;transform:translateX(-50%);width:min(76vw,330px);height:auto;display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 6px;background:#061224f5;border-radius:28px;z-index:10000}'
+          new = '.detailsNav{position:absolute;left:50%;bottom:6.5%;transform:translateX(-50%);width:min(76vw,330px);height:auto;display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 6px;background:transparent;border-radius:28px;z-index:10000}'
+          if old not in s:
+              raise SystemExit('detailsNav target not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Commit fix and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Remove border behind details buttons'
+          rm .github/workflows/fix-details-border.yml
+          git add .github/workflows/fix-details-border.yml
+          git commit -m 'Remove temporary details fix workflow'
+          git push origin restauracao-base-estavel
