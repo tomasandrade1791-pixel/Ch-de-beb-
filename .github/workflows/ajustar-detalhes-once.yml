@@ -20,15 +20,15 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          replacement = '<section id="letter" class="view paperReveal"><img src="detalhes.jpg" alt="Detalhes do chá de bebê"></section>'
-          pattern = r'<section id="letter"\b.*?</section>\s*(?=<section id="gifts")'
-          ns, n = re.subn(pattern, replacement + '\n', s, count=1, flags=re.S)
-          if n != 1:
-              raise SystemExit('Não encontrei exatamente a cartinha de detalhes; nenhuma alteração foi feita.')
-          p.write_text(ns, encoding='utf-8')
+          start = s.find('<section id="letter"')
+          end = s.find('<section id="gifts"', start)
+          if start < 0 or end < 0:
+              raise SystemExit('Não encontrei os limites da cartinha de detalhes; nenhuma alteração foi feita.')
+          replacement = '<section id="letter" class="view paperReveal"><img src="detalhes.jpg" alt="Detalhes do chá de bebê"></section>\n'
+          s = s[:start] + replacement + s[end:]
+          p.write_text(s, encoding='utf-8')
           PY
 
       - name: Gravar e remover este ajuste temporário
