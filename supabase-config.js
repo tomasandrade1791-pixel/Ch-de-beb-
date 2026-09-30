@@ -298,3 +298,34 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
+/* CORREÇÃO DA ÁREA EXTRA ABAIXO DO CONVITE.
+   Mantém a faixa dos botões e os botões clicáveis; remove somente o espaço/borda extra
+   que aparecia depois da imagem do convite. */
+(function(){
+  function removeInvitationBottomGap(){
+    if(document.getElementById('invitationBottomGapFix'))return;
+    const style=document.createElement('style');
+    style.id='invitationBottomGapFix';
+    style.textContent=`
+      #paperReveal{
+        padding:0!important;
+        margin:0!important;
+        min-height:100vh!important;
+        overflow:hidden!important;
+      }
+      #paperReveal img{
+        display:block!important;
+        width:100vw!important;
+        max-width:none!important;
+        height:auto!important;
+        max-height:none!important;
+        margin:0!important;
+        padding:0!important;
+        object-fit:contain!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeInvitationBottomGap);else removeInvitationBottomGap();
+})();
