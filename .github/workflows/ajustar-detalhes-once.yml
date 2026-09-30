@@ -1,0 +1,42 @@
+name: Ajustar cartinha de detalhes
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'Coloca detalhes.jpg apos as regras'
+    steps:
+      - name: Baixar o estado atual
+        uses: actions/checkout@v4
+
+      - name: Trocar somente a cartinha de detalhes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          replacement = '<section id="letter" class="view paperReveal"><img src="detalhes.jpg" alt="Detalhes do chá de bebê"></section>'
+          pattern = r'<section id="letter"\b.*?</section>\s*(?=<section id="gifts")'
+          ns, n = re.subn(pattern, replacement + '\n', s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Não encontrei exatamente a cartinha de detalhes; nenhuma alteração foi feita.')
+          p.write_text(ns, encoding='utf-8')
+          PY
+
+      - name: Gravar e remover este ajuste temporário
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/ajustar-detalhes-once.yml
+          git add index.html .github/workflows/ajustar-detalhes-once.yml
+          git diff --cached --check
+          git commit -m "Coloca detalhes.jpg apos as regras"
+          git push origin main
