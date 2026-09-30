@@ -1,0 +1,33 @@
+name: Fix details layout
+on:
+  push:
+    branches: [restauracao-base-estavel]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adjust details content width
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s2 = s.replace('padding:205px 28px 105px', 'padding:155px 70px 105px')
+          s2 = s2.replace('max-width:620px;margin:0 auto}.detailsContent h1', 'max-width:500px;margin:0 auto}.detailsContent h1')
+          s2 = s2.replace('.detailsContent .message{font-size:17px;line-height:1.72}', '.detailsContent .message{font-size:17px;line-height:1.72;text-align:center}.detailsContent .message p{margin:0 0 24px}')
+          s2 = s2.replace('.detailsContent .detail{background:rgba(255,248,232,.58)}', '.detailsContent .detail{background:rgba(255,248,232,.72);padding:14px 18px;margin:12px 0}')
+          s2 = s2.replace('@media(max-width:420px){.detailsPaper{padding:190px 24px 105px}.detailsContent .message{font-size:16px;line-height:1.7}.detailsContent .detail{padding:13px}', '@media(max-width:420px){.detailsPaper{padding:125px 48px 105px}.detailsContent{max-width:100%}.detailsContent .message{font-size:16px;line-height:1.7}.detailsContent .detail{padding:13px 14px}')
+          if s2 == s:
+              raise SystemExit('No matching details CSS found; refusing to change anything.')
+          p.write_text(s2, encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Ajusta largura do conteúdo da cartinha de detalhes'
+          git push
