@@ -9,21 +9,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Ajustar conteúdo da cartinha de detalhes
+      - name: Ajustar fundo da cartinha de detalhes
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          s2 = s.replace('padding:125px 48px 105px', 'padding:180px 60px 105px')
-          if s2 == s:
-              raise SystemExit('Ajuste esperado não encontrado; não alterar nada.')
-          p.write_text(s2, encoding='utf-8')
+          marker = '</head>'
+          style = '''<style id="details-bow-size-fix">
+.detailsPaper{background-size:100% 92%!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#f4ead5!important}
+</style>'''
+          if 'details-bow-size-fix' not in s:
+              if marker not in s:
+                  raise SystemExit('Cabeçalho não encontrado; não alterar nada.')
+              s = s.replace(marker, style + marker, 1)
+              p.write_text(s, encoding='utf-8')
+          else:
+              print('Ajuste já aplicado.')
           PY
       - name: Commit fix
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Ajusta posição do conteúdo da cartinha de detalhes'
+          git diff --cached --quiet || git commit -m 'Diminui o laço no fundo da cartinha de detalhes'
           git push
