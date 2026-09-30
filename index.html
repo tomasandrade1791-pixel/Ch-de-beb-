@@ -125,7 +125,7 @@ const envCard=document.getElementById('envCard');envCard.addEventListener('click
     if (!active || active.id !== 'rules') return;
     const counter = document.querySelector('.nav .counter');
     const isLast = counter && /07\s*\/\s*07/.test(counter.textContent || '');
-    const isNext = /PR[ÓO]XIMO/i.test((button.textContent || '').trim());
+    const isNext = /PR[ÓO]XIMO|CONTINUAR/i.test((button.textContent || '').trim());
     if (isLast && isNext) {
       e.preventDefault();
       e.stopImmediatePropagation();
