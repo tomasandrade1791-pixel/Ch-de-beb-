@@ -45,6 +45,15 @@
   .nav .counter{font-size:8.5px!important}
 }
 </style>
+<style id="details-style-fix">
+.detailsView{background:#000!important;padding:0!important;align-items:flex-start!important;justify-content:center!important;overflow-y:auto!important}
+.detailsPaper{width:100%;min-height:100vh;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 0 82px;position:relative}
+.detailsImg{display:block;width:min(100%,691px);height:auto;max-width:100%;margin:0 auto;object-fit:contain}
+.detailsNav{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,520px);display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 10px;border-radius:30px;background:#061224f5;z-index:10000;box-shadow:0 4px 20px #0008}
+.detailsNav span{color:#f4ead5;font-size:12px;letter-spacing:.08em;white-space:nowrap}
+.detailsNav .btn{padding:10px 16px;font-size:12px;white-space:nowrap}
+@media(max-width:420px){.detailsNav{width:94vw;gap:6px;padding:6px}.detailsNav .btn{padding:9px 12px;font-size:10px}.detailsNav span{font-size:10px}}
+</style>
 </head>
 <body>
 <section id="open" class="view on dark"><div id="op" class="phrase"></div></section>
@@ -53,6 +62,7 @@
 <section id="env" class="view env"><div class="envWrap"><div class="envCard" id="envCard"><img id="envClosed" src="https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0103.jpg?v=20260921" alt="Cartinha fechada"><img id="envOpen" src="https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0105.jpg?v=20260921" alt="Cartinha aberta"></div><div class="tap" id="tapText">TOQUE NA CARTINHA PARA ABRIR</div></div></section>
 <section id="paperReveal" class="view paperReveal"><img src="https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/IMG-20260919-WA0104.jpg?v=20260921" alt="Papel do chá de bebê"></section>
 <section id="rules" class="view paperV"><div class="paper rulesPaper" id="rp"></div></section>
+<section id="details" class="view paperV detailsView"><div class="detailsPaper"><img class="detailsImg" src="detalhes.jpg?v=20260930" alt="Detalhes do chá de bebê"><div class="detailsNav"><button class="btn" id="detailsBack">‹ VOLTAR</button><span>DETALHES</span><button class="btn" id="detailsNext">PRÓXIMO ›</button></div></div></section>
 <section id="letter" class="view paperV"><div class="paper letterPaper"><h1>⭐ Chá de Bebê ⭐</h1><div class="message"><p><strong>“Antes mesmo de a nossa pequena chegar aos nossos braços, ela já chegou ao coração de muitas pessoas. ❤️⭐</strong></p><p>Somos imensamente gratos a cada um de vocês que escolheu estar presente nesse momento tão importante da nossa família. Cada presença, cada palavra de carinho e cada gesto de amor tornam a espera pela nossa pequena ainda mais especial.</p><p>Obrigada por celebrarem conosco o início dessa nova história e por fazerem parte das primeiras memórias da nossa pequena.</p><p>Que um dia, quando ela olhar para tudo isso, possa saber o quanto foi amada e esperada desde antes de nascer. 💙🍼⭐”</p></div><div class="detail"><b>📅 DATA</b>25 de outubro de 2026</div><div class="detail"><b>⏰ HORÁRIO</b>A definir</div><div class="detail"><b>📍 LOCAL</b>Rua Leoberto Leal, 250 — Vorstadt</div><p style="text-align:center"><button class="btn" onclick="show('gifts')">🎁 VER LISTA DE PRESENTES</button></p><p style="text-align:center"><button class="btn" onclick="show('name')">CONTINUAR →</button></p></div></section>
 <section id="gifts" class="view paperV"><div class="paper"><h1>⭐ Lista de presentes ⭐</h1><p class="intro">Escolha com carinho um presente para a nossa pequena. 💙<br><small>Os papais podem definir as quantidades no painel. Quando uma opção atingir o limite, ela fica indisponível.</small></p><div id="gl"></div><p style="text-align:center"><button class="btn" onclick="show('letter')">‹ VOLTAR</button> <button class="btn" onclick="show('name')">CONTINUAR →</button></p></div></section>
 <section id="name" class="view paperV"><div class="paper"><h1>💙 Antes de continuar...</h1><p class="intro">Queremos saber quem está compartilhando esse momento com a gente.</p><div class="form"><label><strong>Seu nome:</strong></label><input id="gn" placeholder="Digite seu nome"><button class="btn" onclick="saveGuest()">CONTINUAR →</button></div></div></section>
@@ -81,6 +91,59 @@ function respond(ok){document.getElementById('rt').textContent=ok?'💙 Que aleg
 function saveMsg(){const m=document.getElementById('msg').value.trim();const n=document.getElementById('mn').value.trim();if(!m||!n){alert('Preencha seu nome e sua mensagem.');return;}show('finish');}
 const opening=['Uma pequena história está prestes a começar...','Tem alguém muito especial esperando para conhecer vocês...','Agora fiquem com a surpresa...'];let oi=0;function openIntro(){const op=document.getElementById('op');if(oi<opening.length){op.textContent=opening[oi++];setTimeout(()=>{op.textContent='';setTimeout(openIntro,700);},2600);}else{show('alice');setTimeout(()=>show('env'),5200);}}setTimeout(openIntro,500);
 const envCard=document.getElementById('envCard');envCard.addEventListener('click',()=>{envCard.classList.add('opening');setTimeout(()=>show('rules'),1100);});
+</script>
+<script id="details-navigation-fix">
+(function(){
+  let restoringRules = false;
+
+  function goToLastRule(){
+    restoringRules = true;
+    show('rules');
+    let tries = 0;
+    const timer = setInterval(function(){
+      const counter = document.querySelector('.nav .counter');
+      const next = Array.from(document.querySelectorAll('.nav .btn')).find(function(b){
+        return /PR[ÓO]XIMO/i.test((b.textContent || '').trim());
+      });
+      if (counter && /07\s*\/\s*07/.test(counter.textContent || '')) {
+        clearInterval(timer);
+        restoringRules = false;
+        return;
+      }
+      if (next) next.click();
+      if (++tries > 12) {
+        clearInterval(timer);
+        restoringRules = false;
+      }
+    }, 80);
+  }
+
+  document.addEventListener('click', function(e){
+    const button = e.target.closest('.nav .btn');
+    if (!button || restoringRules) return;
+    const active = document.querySelector('.view.on');
+    if (!active || active.id !== 'rules') return;
+    const counter = document.querySelector('.nav .counter');
+    const isLast = counter && /07\s*\/\s*07/.test(counter.textContent || '');
+    const isNext = /PR[ÓO]XIMO/i.test((button.textContent || '').trim());
+    if (isLast && isNext) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      show('details');
+    }
+  }, true);
+
+  document.addEventListener('click', function(e){
+    if (e.target.id === 'detailsBack' || e.target.closest('#detailsBack')) {
+      e.preventDefault();
+      goToLastRule();
+    }
+    if (e.target.id === 'detailsNext' || e.target.closest('#detailsNext')) {
+      e.preventDefault();
+      show('letter');
+    }
+  });
+})();
 </script>
 </body>
 </html>
