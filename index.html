@@ -84,7 +84,7 @@ const rules=[
 function removeNav(){document.querySelectorAll('body>.nav').forEach(n=>n.remove());}
 function show(id){removeNav();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));const e=document.getElementById(id);if(e)e.classList.add('on');if(id==='rules')renderRule();}
 function renderRule(){const rp=document.getElementById('rp');if(!rp)return;const r=rules[ri];rp.innerHTML='<h1>Combinados para o<br>⭐ dia da Alice ⭐</h1><div class="ruleTitle">'+r[1]+'</div><div class="ruleBody">'+r[2]+'</div><div class="nav"><button class="btn" onclick="prev()"'+(ri===0?' disabled':'')+'>‹ VOLTAR</button><span class="counter">'+String(ri+1).padStart(2,'0')+'/07</span><button class="btn" onclick="next()">'+(ri===rules.length-1?'CONTINUAR ›':'PRÓXIMO ›')+'</button></div>';const nav=rp.querySelector('.nav');if(nav)document.body.appendChild(nav);}
-function next(){if(ri<rules.length-1){ri++;renderRule();}else{show('letter');}}
+function next(){if(ri<rules.length-1){ri++;renderRule();}else{show('details');}}
 function prev(){if(ri>0){ri--;renderRule();}}
 function saveGuest(){guestName=document.getElementById('gn').value.trim();if(!guestName){alert('Digite seu nome.');return;}show('confirm');}
 function respond(ok){document.getElementById('rt').textContent=ok?'💙 Que alegria!':'🤍 Sentiremos sua falta!';document.getElementById('rx').innerHTML=ok?'<p>Obrigado por confirmar sua presença. Estamos muito felizes em ter você conosco nesse momento tão especial!</p>':'<p>Obrigado por nos avisar. Mesmo de longe, seu carinho estará presente conosco.</p>';show('response');}
