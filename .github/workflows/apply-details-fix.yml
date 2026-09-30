@@ -24,16 +24,13 @@ jobs:
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          start = s.find('<script id="details-navigation-fix">')
-          end = s.find('</script>', start)
-          if start < 0 or end < 0:
-              raise SystemExit('Bloco details-navigation-fix não encontrado.')
-          block = s[start:end]
-          fixed = block.replace('\\\\', '\\')
-          if fixed == block:
-              raise SystemExit('Nenhuma barra duplicada encontrada no bloco.')
-          p.write_text(s[:start] + fixed + s[end:], encoding='utf-8')
-          print('Correção aplicada ao bloco details-navigation-fix.')
+          old = "const isNext = /PR[ÓO]XIMO/i.test((button.textContent || '').trim());"
+          new = "const isNext = /PR[ÓO]XIMO|CONTINUAR/i.test((button.textContent || '').trim());"
+          if old not in s:
+              raise SystemExit('Linha do botão da última regra não encontrada.')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          print('Botão CONTINUAR da última regra agora abre os detalhes.')
           PY
 
       - name: Publicar correção
