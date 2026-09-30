@@ -1,0 +1,49 @@
+name: Aplicar correção definitiva da navegação
+
+on:
+  push:
+    branches:
+      - restauracao-base-estavel
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Aplicar correção definitiva'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Corrigir navegação
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          start = s.find('<script id="details-navigation-fix">')
+          end = s.find('</script>', start)
+          if start < 0 or end < 0:
+              raise SystemExit('Bloco details-navigation-fix não encontrado.')
+          block = s[start:end]
+          # O arquivo publicado contém barras duplicadas dentro das expressões
+          # regulares JavaScript. Normalizamos somente este bloco.
+          fixed = block.replace('\\\\s', '\\s').replace('\\\\/', '\\/')
+          if fixed == block:
+              raise SystemExit('O bloco já está corrigido.')
+          p.write_text(s[:start] + fixed + s[end:], encoding='utf-8')
+          print('Correção aplicada ao bloco details-navigation-fix.')
+          PY
+
+      - name: Publicar correção
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt
+          git add index.html .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt
+          git diff --cached --check
+          git commit -m "Aplicar correção definitiva"
+          git push origin restauracao-base-estavel
