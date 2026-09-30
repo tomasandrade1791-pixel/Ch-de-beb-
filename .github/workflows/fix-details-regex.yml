@@ -1,0 +1,45 @@
+name: Corrigir condição da última regra
+
+on:
+  push:
+    branches:
+      - restauracao-base-estavel
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Aplicar correção da última regra'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Corrigir regex da navegação
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = r'/07\\s*\\/\\s*07/'
+          new = r'/07\s*\/\s*07/'
+          count = s.count(old)
+          if count == 0:
+              raise SystemExit('Regex antiga não encontrada no index.html.')
+          s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+          print(f'Correções aplicadas: {count}')
+          PY
+
+      - name: Publicar correção
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/fix-details-regex.yml
+          git add index.html .github/workflows/fix-details-regex.yml
+          git diff --cached --check
+          git commit -m "Aplicar correção da última regra"
+          git push origin restauracao-base-estavel
