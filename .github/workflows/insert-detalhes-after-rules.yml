@@ -1,0 +1,118 @@
+name: Adicionar detalhes após os Combinados
+
+on:
+  push:
+    branches:
+      - restauracao-base-estavel
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'Adiciona detalhes após os Combinados'
+    steps:
+      - name: Baixar o projeto completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copiar detalhes.jpg da main e inserir a nova tela
+        run: |
+          git fetch origin main:refs/remotes/origin/main
+          git checkout origin/main -- detalhes.jpg
+
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          if 'id="details"' not in s:
+              marker = '<section id="letter"'
+              details = '''<section id="details" class="view paperV detailsView"><div class="detailsPaper"><img class="detailsImg" src="detalhes.jpg?v=20260930" alt="Detalhes do chá de bebê"><div class="detailsNav"><button class="btn" id="detailsBack">‹ VOLTAR</button><span>DETALHES</span><button class="btn" id="detailsNext">PRÓXIMO ›</button></div></div></section>\n'''
+              if marker not in s:
+                  raise SystemExit('Não encontrei a seção letter para inserir detalhes.')
+              s = s.replace(marker, details + marker, 1)
+
+          if 'id="details-style-fix"' not in s:
+              style = '''<style id="details-style-fix">
+          .detailsView{background:#000!important;padding:0!important;align-items:flex-start!important;justify-content:center!important;overflow-y:auto!important}
+          .detailsPaper{width:100%;min-height:100vh;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 0 82px;position:relative}
+          .detailsImg{display:block;width:min(100%,691px);height:auto;max-width:100%;margin:0 auto;object-fit:contain}
+          .detailsNav{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,520px);display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 10px;border-radius:30px;background:#061224f5;z-index:10000;box-shadow:0 4px 20px #0008}
+          .detailsNav span{color:#f4ead5;font-size:12px;letter-spacing:.08em;white-space:nowrap}
+          .detailsNav .btn{padding:10px 16px;font-size:12px;white-space:nowrap}
+          @media(max-width:420px){.detailsNav{width:94vw;gap:6px;padding:6px}.detailsNav .btn{padding:9px 12px;font-size:10px}.detailsNav span{font-size:10px}}
+          </style>\n'''
+              s = s.replace('</head>', style + '</head>', 1)
+
+          if 'id="details-navigation-fix"' not in s:
+              script = '''<script id="details-navigation-fix">
+          (function(){
+            let restoringRules = false;
+
+            function goToLastRule(){
+              restoringRules = true;
+              show('rules');
+              let tries = 0;
+              const timer = setInterval(function(){
+                const counter = document.querySelector('.nav .counter');
+                const next = Array.from(document.querySelectorAll('.nav .btn')).find(function(b){
+                  return /PR[ÓO]XIMO/i.test((b.textContent || '').trim());
+                });
+                if (counter && /07\\s*\\/\\s*07/.test(counter.textContent || '')) {
+                  clearInterval(timer);
+                  restoringRules = false;
+                  return;
+                }
+                if (next) next.click();
+                if (++tries > 12) {
+                  clearInterval(timer);
+                  restoringRules = false;
+                }
+              }, 80);
+            }
+
+            document.addEventListener('click', function(e){
+              const button = e.target.closest('.nav .btn');
+              if (!button || restoringRules) return;
+              const active = document.querySelector('.view.on');
+              if (!active || active.id !== 'rules') return;
+              const counter = document.querySelector('.nav .counter');
+              const isLast = counter && /07\\s*\\/\\s*07/.test(counter.textContent || '');
+              const isNext = /PR[ÓO]XIMO/i.test((button.textContent || '').trim());
+              if (isLast && isNext) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                show('details');
+              }
+            }, true);
+
+            document.addEventListener('click', function(e){
+              if (e.target.id === 'detailsBack' || e.target.closest('#detailsBack')) {
+                e.preventDefault();
+                goToLastRule();
+              }
+              if (e.target.id === 'detailsNext' || e.target.closest('#detailsNext')) {
+                e.preventDefault();
+                show('letter');
+              }
+            });
+          })();
+          </script>\n'''
+              s = s.replace('</body>', script + '</body>', 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Validar e publicar a alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/insert-detalhes-after-rules.yml
+          git add index.html detalhes.jpg .github/workflows/insert-detalhes-after-rules.yml
+          git diff --cached --check
+          git commit -m "Adiciona detalhes após os Combinados"
+          git push origin restauracao-base-estavel
