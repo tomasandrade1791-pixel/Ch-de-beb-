@@ -29,11 +29,9 @@ jobs:
           if start < 0 or end < 0:
               raise SystemExit('Bloco details-navigation-fix não encontrado.')
           block = s[start:end]
-          # O arquivo publicado contém barras duplicadas dentro das expressões
-          # regulares JavaScript. Normalizamos somente este bloco.
-          fixed = block.replace('\\\\s', '\\s').replace('\\\\/', '\\/')
+          fixed = block.replace('\\\\', '\\')
           if fixed == block:
-              raise SystemExit('O bloco já está corrigido.')
+              raise SystemExit('Nenhuma barra duplicada encontrada no bloco.')
           p.write_text(s[:start] + fixed + s[end:], encoding='utf-8')
           print('Correção aplicada ao bloco details-navigation-fix.')
           PY
@@ -42,8 +40,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -f .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt
-          git add index.html .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt
+          rm -f .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt .github/fix-trigger2.txt
+          git add index.html .github/workflows/apply-details-fix.yml .github/workflows/fix-details-regex.yml .github/fix-trigger.txt .github/fix-trigger2.txt
           git diff --cached --check
           git commit -m "Aplicar correção definitiva"
           git push origin restauracao-base-estavel
