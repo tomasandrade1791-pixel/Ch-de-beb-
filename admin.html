@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Painel • Chá de Bebê</title>
+<style>
+:root{--cream:#f4ead5;--ink:#18263a;--navy:#08244a;--gold:#d7b86a;--bg:#05080d;--card:#0d1624;--muted:#aeb8c6;--ok:#8bd49a;--danger:#f19a9a}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--cream);font-family:Georgia,"Times New Roman",serif}button,input{font:inherit}button{cursor:pointer}
+.wrap{width:min(1100px,92vw);margin:auto;padding:28px 0 60px}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px}.loginBox{width:min(460px,92vw);background:var(--card);border:1px solid #26364d;border-radius:20px;padding:30px;box-shadow:0 20px 70px #0008;text-align:center}.loginBox h1{color:var(--cream);margin:0 0 12px;font-size:32px}.loginBox p{color:var(--muted);line-height:1.6}.field{display:grid;gap:8px;text-align:left;margin:18px 0}.field input{width:100%;padding:14px;border-radius:12px;border:1px solid #3b4a60;background:#07101c;color:var(--cream);outline:none}.btn{border:1px solid var(--gold);border-radius:999px;padding:12px 18px;background:var(--cream);color:var(--navy);font-weight:bold}.btn.secondary{background:transparent;color:var(--cream)}.error{color:var(--danger);min-height:22px}.hint{font-size:13px;color:var(--muted)}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}header h1{margin:0;color:var(--cream);font-size:clamp(26px,5vw,42px)}header p{margin:6px 0 0;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}.stat{background:var(--card);border:1px solid #26364d;border-radius:16px;padding:18px}.stat b{display:block;font-size:30px;color:var(--gold)}.stat span{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:var(--card);border:1px solid #26364d;border-radius:16px;padding:20px;min-height:180px}.panel h2{margin:0 0 12px;color:var(--cream);font-size:21px}.empty{color:var(--muted);line-height:1.6}.list{display:grid;gap:8px}.item{padding:11px 12px;border-radius:10px;background:#07101c;border:1px solid #1d2b3e}.item strong{color:var(--cream)}.item small{display:block;color:var(--muted);margin-top:4px}.status{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;margin-left:6px;background:#20302a;color:var(--ok)}
+.notice{margin:16px 0;padding:14px 16px;border-radius:12px;border:1px solid #5c4b27;background:#211b0d;color:#ead9a4;line-height:1.55}.footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+@media(max-width:800px){.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.actions{justify-content:flex-start}}
+@media(max-width:450px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <div class="loginBox">
+    <h1>🔐 Painel da Alice</h1>
+    <p id="loginText">Área administrativa. Os convidados não devem usar esta página.</p>
+    <div class="field"><label for="password"><strong id="passwordLabel">Senha</strong></label><input id="password" type="password" autocomplete="new-password" placeholder="Digite sua senha"></div>
+    <button class="btn" id="loginBtn">ENTRAR</button>
+    <div id="error" class="error"></div>
+    <p class="hint" id="setupHint"></p>
+  </div>
+</div>
+
+<main id="app" class="wrap hidden">
+  <header>
+    <div><h1>⭐ Painel da Alice</h1><p>Área administrativa do chá de bebê</p></div>
+    <div class="actions"><button class="btn secondary" id="refreshBtn">↻ ATUALIZAR</button><button class="btn secondary" id="logoutBtn">SAIR</button></div>
+  </header>
+
+  <div class="notice"><strong>Importante:</strong> este painel já está criado, mas a versão atual do convite não está conectada a uma base de dados. Por isso, os dados abaixo só aparecerão depois que o armazenamento do convite for ligado ao painel.</div>
+
+  <section class="cards">
+    <div class="stat"><b id="confirmed">0</b><span>Confirmaram presença</span></div>
+    <div class="stat"><b id="declined">0</b><span>Não confirmaram</span></div>
+    <div class="stat"><b id="giftCount">0</b><span>Presentes escolhidos</span></div>
+    <div class="stat"><b id="messageCount">0</b><span>Mensagens para Alice</span></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel"><h2>💙 Confirmações</h2><div id="confirmList" class="list"><div class="empty">Nenhuma confirmação carregada ainda.</div></div></div>
+    <div class="panel"><h2>🎁 Presentes escolhidos</h2><div id="giftList" class="list"><div class="empty">Nenhum presente carregado ainda.</div></div></div>
+    <div class="panel"><h2>💌 Mensagens para Alice</h2><div id="messageList" class="list"><div class="empty">Nenhuma mensagem carregada ainda.</div></div></div>
+    <div class="panel"><h2>⚙️ Estado do painel</h2><div class="list"><div class="item"><strong>Acesso administrativo</strong><small><span class="status">ATIVO</span> Proteção local por senha.</small></div><div class="item"><strong>Banco de dados</strong><small id="dbStatus">Ainda não conectado ao painel.</small></div><div class="item"><strong>Convite público</strong><small>Continua separado deste painel.</small></div></div></div>
+  </section>
+  <div class="footer">Painel administrativo • Chá de bebê da Alice</div>
+</main>
+
+<script>
+const KEY='alice_admin_password_hash_v1';
+const SESSION='alice_admin_session_v1';
+const enc=new TextEncoder();
+async function hash(text){const b=await crypto.subtle.digest('SHA-256',enc.encode(text));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function hasPassword(){return !!localStorage.getItem(KEY)}
+function setLogged(){sessionStorage.setItem(SESSION,'1');document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');loadData()}
+function logout(){sessionStorage.removeItem(SESSION);document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('password').value=''}
+function setupMode(){document.getElementById('loginText').textContent='Primeiro acesso: crie uma senha para proteger este painel neste navegador.';document.getElementById('passwordLabel').textContent='Crie sua senha';document.getElementById('loginBtn').textContent='CRIAR SENHA';document.getElementById('setupHint').textContent='A senha fica armazenada somente neste navegador.'}
+async function enter(){const input=document.getElementById('password');const err=document.getElementById('error');err.textContent='';if(!input.value){err.textContent='Digite uma senha.';return}if(!hasPassword()){if(input.value.length<8){err.textContent='Use pelo menos 8 caracteres.';return}localStorage.setItem(KEY,await hash(input.value));setLogged();return}if((await hash(input.value))===localStorage.getItem(KEY)){setLogged()}else err.textContent='Senha incorreta.'}
+function loadData(){
+  // Reservado para a integração com o banco do convite.
+  const confirmations=JSON.parse(localStorage.getItem('alice_confirmacoes')||'[]');
+  const gifts=JSON.parse(localStorage.getItem('alice_presentes')||'[]');
+  const messages=JSON.parse(localStorage.getItem('alice_mensagens')||'[]');
+  const yes=confirmations.filter(x=>x.confirmed===true).length;const no=confirmations.filter(x=>x.confirmed===false).length;
+  document.getElementById('confirmed').textContent=yes;document.getElementById('declined').textContent=no;document.getElementById('giftCount').textContent=gifts.length;document.getElementById('messageCount').textContent=messages.length;
+  render('confirmList',confirmations,x=>`<div class="item"><strong>${esc(x.name||'Convidado')}</strong><small>${x.confirmed?'Confirmou presença':'Não poderá comparecer'}</small></div>`,'Nenhuma confirmação carregada ainda.');
+  render('giftList',gifts,x=>`<div class="item"><strong>${esc(x.gift||x.name||'Presente')}</strong><small>${esc(x.name||'Convidado')}</small></div>`,'Nenhum presente carregado ainda.');
+  render('messageList',messages,x=>`<div class="item"><strong>${esc(x.name||'Convidado')}</strong><small>${esc(x.message||'')}</small></div>`,'Nenhuma mensagem carregada ainda.');
+}
+function render(id,data,fn,empty){document.getElementById(id).innerHTML=data.length?data.map(fn).join(''):`<div class="empty">${empty}</div>`}
+function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
+document.getElementById('loginBtn').addEventListener('click',enter);document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')enter()});document.getElementById('logoutBtn').addEventListener('click',logout);document.getElementById('refreshBtn').addEventListener('click',loadData);
+if(!hasPassword())setupMode();if(sessionStorage.getItem(SESSION)==='1')setLogged();
+</script>
+</body>
+</html>
