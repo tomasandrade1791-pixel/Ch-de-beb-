@@ -1,9 +1,182 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Painel dos papais — Alice</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>:root{--c:#f4ead5;--n:#08244a;--g:#d7b86a;--d:#8b2635}*{box-sizing:border-box}body{margin:0;background:#071426;font-family:Georgia,serif;color:#18263a}.wrap{max-width:1050px;margin:auto;padding:20px}.card{background:var(--c);border-radius:16px;padding:20px;margin:15px 0;box-shadow:0 15px 40px #0006}h1,h2{color:var(--n)}h1{text-align:center}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.field{display:grid;gap:5px}input,textarea{width:100%;padding:11px;border:1px solid #cbbd9e;border-radius:9px;background:#fff9}button{border:1px solid var(--g);border-radius:999px;padding:10px 16px;background:var(--c);color:var(--n);font-weight:bold;cursor:pointer}.primary{background:var(--n);color:var(--c)}.danger{background:var(--d);color:white}.hidden{display:none}.status{padding:10px;background:#fff8;border-radius:9px;margin-top:10px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:14px;text-align:center;border:1px solid #cbbd9e;border-radius:10px}.stat b{display:block;font-size:27px;color:var(--n)}.gift{display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #d7ccb4}.pill{white-space:nowrap}.scroll{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:9px;text-align:left;border-bottom:1px solid #d7ccb4;vertical-align:top}.msg{white-space:pre-wrap}@media(max-width:700px){.grid,.stats{grid-template-columns:1fr}.gift{grid-template-columns:1fr 70px 85px}}</style></head><body><div class="wrap"><section id="login" class="card"><h1>💙 Painel dos papais</h1><p>Área exclusiva do administrador.</p><p>Administrador: <b>tomasandrade1791@gmail.com</b></p><button class="primary" id="loginBtn">ENVIAR LINK DE ACESSO</button><div id="loginMsg" class="status hidden"></div></section><main id="app" class="hidden"><section class="card"><h1>⭐ Painel da Alice ⭐</h1><p id="who"></p><button class="danger" id="logout">SAIR</button></section><section class="card"><h2>📅 Dados do evento</h2><div class="grid"><label class="field">Data<input id="date" type="date"></label><label class="field">Horário<input id="time" type="time"></label><label class="field">Local<input id="place"></label></div><p><button class="primary" id="saveEvent">SALVAR</button></p><div id="eventMsg" class="status hidden"></div></section><section class="card"><h2>🎁 Quantidades dos presentes</h2><p>Exemplo: <b>2/5</b> = 2 pessoas escolheram, limite de 5.</p><div id="gifts"></div><p><button class="primary" id="saveLimits">SALVAR QUANTIDADES</button></p><div id="giftMsg" class="status hidden"></div></section><section class="card"><h2>👥 Resumo</h2><div class="stats"><div class="stat"><b id="yes">0</b>confirmaram</div><div class="stat"><b id="no">0</b>não confirmaram</div><div class="stat"><b id="total">0</b>respostas</div></div></section><section class="card"><h2>👥 Convidados</h2><div class="scroll"><table><thead><tr><th>Nome</th><th>Presença</th><th>Presente</th><th>Quando</th></tr></thead><tbody id="rsvp"></tbody></table></div></section><section class="card"><h2>💌 Cartinhas para a Alice</h2><div id="messages"></div></section></main></div><script>
-const URL='https://pzhydhwkqqlowhfnrszd.supabase.co',KEY='sb_publishable_e2R0FHCX7CtG_idoo9LddQ_tAKB2K5u',ADMIN='tomasandrade1791@gmail.com',db=supabase.createClient(URL,KEY);const catalog={
-'🍼 Higiene e cuidados':['Pacote de fraldas M','Pacote de fraldas G','Pacote de fraldas XG','Lenços umedecidos','Sabonete líquido para bebê','Creme/pomada para assaduras','Kit de higiene para bebê','Fraldas de pano'],'👕 Roupinhas':['Meias','Casaquinho','Touquinha','Babadores'],'🛁 Banho':['Toalha de banho','Toalha com capuz','Kit de toalhinhas'],'🍼 Alimentação':['Escova para mamadeira','Babador impermeável','Paninhos de boca'],'🛏️ Quarto e sono':['Lençol para berço','Protetor de colchão','Manta','Cueiro','Cobertor apropriado para bebê'],'🎀 Presentes especiais':['Manta personalizada','Toalha personalizada','Kit de saída da maternidade','Vale-presente de loja infantil'],'⭐ Opção livre':['Presente escolhido livremente — algo que o convidado considere útil para a Alice ou a mamãe.']};const all=Object.entries(catalog).flatMap(([c,a])=>a.map(n=>({c,n})));const $=x=>document.getElementById(x);function notice(id,t,e=false){$(id).textContent=t;$(id).classList.remove('hidden');$(id).style.color=e?'#8b2635':'#1f6b45'}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function dt(v){return v?new Date(v).toLocaleString('pt-BR'):'—'}
-async function boot(){const {data}=await db.auth.getSession();if(data.session)open(data.session.user);db.auth.onAuthStateChange((_,s)=>{if(s)open(s.user)});}async function open(u){if(!u||u.email.toLowerCase()!==ADMIN){await db.auth.signOut();notice('loginMsg','Esta conta não é autorizada.',true);return}$('login').classList.add('hidden');$('app').classList.remove('hidden');$('who').textContent='Acesso autenticado: '+u.email;load()}
-async function load(){await Promise.all([eventLoad(),giftLoad(),rsvpLoad(),msgLoad()])}async function eventLoad(){const {data,error}=await db.from('event_settings').select('*').eq('id',1).maybeSingle();if(error){notice('eventMsg','Execute o admin-schema.sql no Supabase.',true);return}if(data){$('date').value=data.event_date||'';$('time').value=data.event_time||'';$('place').value=data.event_location||''}}
-async function giftLoad(){const {data,error}=await db.from('gift_limits').select('*').order('id');if(error){notice('giftMsg','Execute o admin-schema.sql no Supabase.',true);return}const map=new Map((data||[]).map(x=>[x.name,x]));const {data:r}=await db.from('rsvps').select('gifts,presence');const used={};(r||[]).forEach(x=>{if(x.presence)(x.gifts||[]).forEach(g=>used[g]=(used[g]||0)+1)});$('gifts').innerHTML=all.map(x=>{const row=map.get(x.n),lim=row?.limit||0;return `<div class="gift"><div><b>${esc(x.n)}</b><br><small>${esc(x.c)}</small></div><span class="pill">${used[x.n]||0}/${lim}</span><input class="lim" data-name="${esc(x.n)}" type="number" min="0" value="${lim}"></div>`}).join('')}
-async function rsvpLoad(){const {data,error}=await db.from('rsvps').select('*').order('created_at',{ascending:false});if(error){$('rsvp').innerHTML='<tr><td colspan="4">Erro ao carregar confirmações.</td></tr>';return}const a=data||[];$('yes').textContent=a.filter(x=>x.presence).length;$('no').textContent=a.filter(x=>!x.presence).length;$('total').textContent=a.length;$('rsvp').innerHTML=a.map(x=>`<tr><td><b>${esc(x.name||'—')}</b></td><td>${x.presence?'💙 Confirmou':'🤍 Não confirmou'}</td><td>${esc((x.gifts||[]).join(', ')||'Nenhum')}</td><td>${dt(x.created_at||x.at)}</td></tr>`).join('')||'<tr><td colspan="4">Nenhuma resposta.</td></tr>'}
-async function msgLoad(){const {data,error}=await db.from('messages').select('*').order('created_at',{ascending:false});if(error){$('messages').textContent='Erro ao carregar mensagens.';return}$('messages').innerHTML=(data||[]).map(x=>`<div class="status"><b>💙 ${esc(x.name||'Convidado')}</b><div class="msg">${esc(x.message||'')}</div><small>${dt(x.created_at||x.at)}</small></div>`).join('')||'<p>Nenhuma mensagem ainda.</p>'}
-$('loginBtn').onclick=async()=>{const {error}=await db.auth.signInWithOtp({email:ADMIN,options:{emailRedirectTo:location.href}});if(error)notice('loginMsg',error.message,true);else notice('loginMsg','Link enviado para '+ADMIN+'.')};$('logout').onclick=()=>db.auth.signOut();$('saveEvent').onclick=async()=>{const {error}=await db.from('event_settings').upsert({id:1,event_date:$('date').value,event_time:$('time').value,event_location:$('place').value});notice('eventMsg',error?error.message:'Dados do evento salvos.',!!error)};$('saveLimits').onclick=async()=>{const rows=[...document.querySelectorAll('.lim')].map(i=>{const x=all.find(a=>a.n===i.dataset.name);return{category:x.c,name:x.n,limit:Math.max(0,+i.value||0)}});const {error}=await db.from('gift_limits').upsert(rows,{onConflict:'name'});if(!error)await giftLoad();notice('giftMsg',error?error.message:'Quantidades salvas.',!!error)};boot();</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel dos papais — Alice</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--c:#f4ead5;--n:#08244a;--g:#d7b86a;--d:#8b2635;--ok:#1f6b45}*{box-sizing:border-box}body{margin:0;background:#071426;font-family:Georgia,"Times New Roman",serif;color:#18263a}.wrap{max-width:1050px;margin:auto;padding:20px}.card{background:var(--c);border-radius:16px;padding:20px;margin:15px 0;box-shadow:0 15px 40px #0006}h1,h2{color:var(--n)}h1{text-align:center}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.field{display:grid;gap:5px}input,textarea{width:100%;padding:11px;border:1px solid #cbbd9e;border-radius:9px;background:#fff9;color:#18263a}button{border:1px solid var(--g);border-radius:999px;padding:10px 16px;background:var(--c);color:var(--n);font-weight:bold;cursor:pointer}.primary{background:var(--n);color:var(--c)}.danger{background:var(--d);color:#fff}.secondary{background:#fff8}.hidden{display:none}.status{padding:10px;background:#fff8;border-radius:9px;margin-top:10px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:14px;text-align:center;border:1px solid #cbbd9e;border-radius:10px}.stat b{display:block;font-size:27px;color:var(--n)}.gift{display:grid;grid-template-columns:1fr 85px 105px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #d7ccb4}.pill{white-space:nowrap;font-weight:bold;color:var(--n)}.scroll{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:9px;text-align:left;border-bottom:1px solid #d7ccb4;vertical-align:top}.msg{white-space:pre-wrap;line-height:1.55}.muted{opacity:.75;font-size:.9rem}.actions{display:flex;gap:8px;flex-wrap:wrap}.ok{color:var(--ok)}.err{color:var(--d)}@media(max-width:700px){.grid,.stats{grid-template-columns:1fr}.gift{grid-template-columns:1fr 70px 85px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section id="login" class="card">
+<h1>💙 Painel dos papais</h1>
+<p>Esta área é exclusiva do administrador do convite.</p>
+<p>Administrador autorizado: <b>tomasandrade1791@gmail.com</b></p>
+<button class="primary" id="loginBtn">ENVIAR LINK DE ACESSO</button>
+<div id="loginMsg" class="status hidden"></div>
+</section>
+
+<main id="app" class="hidden">
+<section class="card">
+<h1>⭐ Painel da Alice ⭐</h1>
+<p id="who"></p>
+<div class="actions"><button class="primary" id="refresh">🔄 ATUALIZAR</button><button class="danger" id="logout">SAIR</button></div>
+</section>
+
+<section class="card">
+<h2>📅 Dados do evento</h2>
+<p class="muted">Esses dados serão usados pelo convite quando a integração pública estiver ativa.</p>
+<div class="grid">
+<label class="field">Data<input id="date" type="date"></label>
+<label class="field">Horário<input id="time" type="time"></label>
+<label class="field">Local<input id="place" type="text" placeholder="Local do evento"></label>
+</div>
+<p><button class="primary" id="saveEvent">SALVAR DADOS DO EVENTO</button></p>
+<div id="eventMsg" class="status hidden"></div>
+</section>
+
+<section class="card">
+<h2>🎁 Quantidades dos presentes</h2>
+<p>O número à esquerda mostra quantas pessoas já escolheram o presente. O campo à direita é o limite definido por vocês. Exemplo: <b>2/5</b>.</p>
+<div id="gifts"></div>
+<p><button class="primary" id="saveLimits">SALVAR QUANTIDADES</button></p>
+<div id="giftMsg" class="status hidden"></div>
+</section>
+
+<section class="card">
+<h2>👥 Resumo das confirmações</h2>
+<div class="stats">
+<div class="stat"><b id="yes">0</b>confirmaram</div>
+<div class="stat"><b id="no">0</b>não confirmaram</div>
+<div class="stat"><b id="total">0</b>respostas</div>
+</div>
+</section>
+
+<section class="card">
+<h2>👥 Convidados</h2>
+<p class="muted">Aqui aparecem o nome, a resposta e o(s) presente(s) escolhido(s).</p>
+<div class="scroll"><table><thead><tr><th>Nome</th><th>Presença</th><th>Presente(s)</th><th>Quando</th></tr></thead><tbody id="rsvp"></tbody></table></div>
+</section>
+
+<section class="card">
+<h2>💌 Cartinhas para a Alice</h2>
+<div id="messages"></div>
+</section>
+</main>
+</div>
+
+<script>
+const SUPABASE_URL='https://pzhydhwkqqlowhfnrszd.supabase.co';
+const SUPABASE_KEY='sb_publishable_e2R0FHCX7CtG_idoo9LddQ_tAKB2K5u';
+const ADMIN='tomasandrade1791@gmail.com';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const catalog={
+'🍼 Higiene e cuidados':['Pacote de fraldas M','Pacote de fraldas G','Pacote de fraldas XG','Lenços umedecidos','Sabonete líquido para bebê','Creme/pomada para assaduras','Kit de higiene para bebê','Fraldas de pano'],
+'👕 Roupinhas':['Meias','Casaquinho','Touquinha','Babadores'],
+'🛁 Banho':['Toalha de banho','Toalha com capuz','Kit de toalhinhas'],
+'🍼 Alimentação':['Escova para mamadeira','Babador impermeável','Paninhos de boca'],
+'🛏️ Quarto e sono':['Lençol para berço','Protetor de colchão','Manta','Cueiro','Cobertor apropriado para bebê'],
+'🎀 Presentes especiais':['Manta personalizada','Toalha personalizada','Kit de saída da maternidade','Vale-presente de loja infantil'],
+'⭐ Opção livre':['Presente escolhido livremente — algo que o convidado considere útil para a Alice ou a mamãe.']
+};
+const all=Object.entries(catalog).flatMap(([category,names])=>names.map(name=>({category,name})));
+const $=id=>document.getElementById(id);
+
+function notice(id,text,error=false){const e=$(id);e.textContent=text;e.classList.remove('hidden');e.className='status '+(error?'err':'ok')}
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function formatDate(value){return value?new Date(value).toLocaleString('pt-BR'):'—'}
+function isAdmin(user){return !!user&&String(user.email||'').toLowerCase()===ADMIN}
+
+async function openPanel(user){
+  if(!isAdmin(user)){
+    await db.auth.signOut();
+    notice('loginMsg','Esta conta não é autorizada.',true);
+    return;
+  }
+  $('login').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  $('who').textContent='Acesso autenticado: '+user.email;
+  await loadAll();
+}
+
+async function boot(){
+  const {data}=await db.auth.getSession();
+  if(data.session)await openPanel(data.session.user);
+  db.auth.onAuthStateChange(async(_,session)=>{
+    if(session)await openPanel(session.user);
+    else{$('app').classList.add('hidden');$('login').classList.remove('hidden');}
+  });
+}
+
+async function loadAll(){
+  await Promise.all([loadEvent(),loadGifts(),loadRsvps(),loadMessages()]);
+}
+
+async function loadEvent(){
+  const {data,error}=await db.from('event_settings').select('*').eq('id',1).maybeSingle();
+  if(error){notice('eventMsg','Não foi possível carregar os dados do evento: '+error.message,true);return}
+  if(data){$('date').value=data.event_date||'';$('time').value=data.event_time||'';$('place').value=data.event_location||'';}
+}
+
+async function loadGifts(){
+  const {data,error}=await db.from('gift_limits').select('*').order('id');
+  if(error){notice('giftMsg','Não foi possível carregar os presentes: '+error.message,true);return}
+  const map=new Map((data||[]).map(row=>[row.name,row]));
+  const {data:rsvps,error:rsvpError}=await db.from('rsvps').select('gifts,presence');
+  if(rsvpError){notice('giftMsg','Os limites carregaram, mas não foi possível calcular os escolhidos: '+rsvpError.message,true);}
+  const used={};
+  (rsvps||[]).forEach(row=>{
+    if(!row.presence)return;
+    (Array.isArray(row.gifts)?row.gifts:[]).forEach(gift=>{used[gift]=(used[gift]||0)+1;});
+  });
+  $('gifts').innerHTML=all.map(item=>{
+    const row=map.get(item.name),limit=row?Number(row.limit)||0:0;
+    return `<div class="gift"><div><b>${esc(item.name)}</b><br><small>${esc(item.category)}</small></div><span class="pill">${used[item.name]||0}/${limit}</span><input class="lim" data-name="${esc(item.name)}" type="number" min="0" value="${limit}"></div>`;
+  }).join('');
+}
+
+async function loadRsvps(){
+  const {data,error}=await db.from('rsvps').select('*').order('created_at',{ascending:false});
+  if(error){$('rsvp').innerHTML='<tr><td colspan="4">Erro ao carregar confirmações: '+esc(error.message)+'</td></tr>';return}
+  const rows=data||[];
+  $('yes').textContent=rows.filter(row=>row.presence===true).length;
+  $('no').textContent=rows.filter(row=>row.presence===false).length;
+  $('total').textContent=rows.length;
+  $('rsvp').innerHTML=rows.map(row=>`<tr><td><b>${esc(row.name||'—')}</b></td><td>${row.presence?'💙 Confirmou':'🤍 Não confirmou'}</td><td>${esc((Array.isArray(row.gifts)?row.gifts:[]).join(', ')||'Nenhum')}</td><td>${formatDate(row.created_at||row.at)}</td></tr>`).join('')||'<tr><td colspan="4">Nenhuma resposta registrada.</td></tr>';
+}
+
+async function loadMessages(){
+  const {data,error}=await db.from('messages').select('*').order('created_at',{ascending:false});
+  if(error){$('messages').innerHTML='<p class="err">Erro ao carregar mensagens: '+esc(error.message)+'</p>';return}
+  $('messages').innerHTML=(data||[]).map(row=>`<div class="status"><b>💙 ${esc(row.name||'Convidado')}</b><div class="msg">${esc(row.message||'')}</div><small>${formatDate(row.created_at||row.at)}</small></div>`).join('')||'<p>Nenhuma mensagem ainda.</p>';
+}
+
+$('loginBtn').onclick=async()=>{
+  const {error}=await db.auth.signInWithOtp({email:ADMIN,options:{emailRedirectTo:location.href}});
+  if(error)notice('loginMsg','Erro ao enviar o link: '+error.message,true);
+  else notice('loginMsg','Link enviado para '+ADMIN+'. Abra o e-mail e toque no link para entrar no painel.');
+};
+$('logout').onclick=()=>db.auth.signOut();
+$('refresh').onclick=()=>loadAll();
+$('saveEvent').onclick=async()=>{
+  const {error}=await db.from('event_settings').upsert({id:1,event_date:$('date').value,event_time:$('time').value,event_location:$('place').value});
+  notice('eventMsg',error?'Erro ao salvar: '+error.message:'Dados do evento salvos com sucesso.',!!error);
+};
+$('saveLimits').onclick=async()=>{
+  const rows=[...document.querySelectorAll('.lim')].map(input=>{
+    const item=all.find(x=>x.name===input.dataset.name);
+    return {category:item.category,name:item.name,limit:Math.max(0,Number(input.value)||0)};
+  });
+  const {error}=await db.from('gift_limits').upsert(rows,{onConflict:'name'});
+  if(!error)await loadGifts();
+  notice('giftMsg',error?'Erro ao salvar quantidades: '+error.message:'Quantidades salvas com sucesso.',!!error);
+};
+
+boot();
+</script>
+</body>
+</html>
