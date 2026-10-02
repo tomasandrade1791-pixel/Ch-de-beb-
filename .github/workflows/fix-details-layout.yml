@@ -1,7 +1,7 @@
-name: Fix details layout
+name: Fix details image
 on:
   push:
-    branches: [restauracao-base-estavel]
+    branches: [main]
 permissions:
   contents: write
 jobs:
@@ -9,28 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Ajustar fundo da cartinha de detalhes
+      - name: Corrigir imagem da tela de detalhes
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          marker = '</head>'
-          style = '''<style id="details-bow-size-fix">
-.detailsPaper{background-size:100% 92%!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#f4ead5!important}
-</style>'''
-          if 'details-bow-size-fix' not in s:
-              if marker not in s:
-                  raise SystemExit('Cabeçalho não encontrado; não alterar nada.')
-              s = s.replace(marker, style + marker, 1)
+          old = [
+              'file_00000000e634820e9997cef30dd9cb52.png?v=20260930-2',
+              'file_000000003d80820e9ff8a17638f02f00.png?v=20260930-1'
+          ]
+          new = 'detalhes.jpg?v=20261002'
+          changed = False
+          for value in old:
+              if value in s:
+                  s = s.replace(value, new)
+                  changed = True
+          if changed:
               p.write_text(s, encoding='utf-8')
           else:
-              print('Ajuste já aplicado.')
+              print('Nenhuma referência quebrada encontrada.')
           PY
       - name: Commit fix
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Diminui o laço no fundo da cartinha de detalhes'
+          git diff --cached --quiet || git commit -m 'Corrige imagem da tela de detalhes'
           git push
