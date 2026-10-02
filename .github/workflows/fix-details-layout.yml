@@ -9,17 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Corrigir imagem da tela de detalhes
+      - name: Restaurar imagem da tela de presentes
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
           old = [
+              'detalhes.jpg?v=20261002',
               'file_00000000e634820e9997cef30dd9cb52.png?v=20260930-2',
               'file_000000003d80820e9ff8a17638f02f00.png?v=20260930-1'
           ]
-          new = 'detalhes.jpg?v=20261002'
+          new = 'file_000000003d80820e9ff8a17638f02f00.png?v=20261002-3'
           changed = False
           for value in old:
               if value in s:
@@ -28,12 +29,12 @@ jobs:
           if changed:
               p.write_text(s, encoding='utf-8')
           else:
-              print('Nenhuma referência quebrada encontrada.')
+              print('Nenhuma referência antiga encontrada.')
           PY
       - name: Commit fix
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Corrige imagem da tela de detalhes'
+          git diff --cached --quiet || git commit -m 'Restaura imagem da escolha de presentes'
           git push
