@@ -325,3 +325,29 @@ window.AliceDB = null;
   `;
   document.head.appendChild(style);
 })();
+
+/* Correção final: a opção "não poderei comparecer" termina no próprio recado. */
+(function(){
+  function hideNoAttendanceContinue(){
+    const response=document.getElementById('response');
+    if(!response)return;
+    const title=document.getElementById('rt');
+    const buttons=response.querySelectorAll('button');
+    const noShow=title && /NÃO PODEREI|NÃO.*COMPARECER|NÃO PODEREI COMPARECER/i.test(title.textContent||'');
+    buttons.forEach(function(btn){
+      if(noShow || /CONTINUAR/i.test(btn.textContent||'')){
+        if(noShow)btn.remove();
+      }
+    });
+  }
+  function watch(){
+    hideNoAttendanceContinue();
+    const response=document.getElementById('response');
+    if(response && !response.dataset.noAttendanceWatch){
+      response.dataset.noAttendanceWatch='1';
+      new MutationObserver(hideNoAttendanceContinue).observe(response,{subtree:true,childList:true,characterData:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+  setInterval(hideNoAttendanceContinue,500);
+})();
