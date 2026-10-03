@@ -9,31 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Corrigir imagem da tela de detalhes
+      - name: Corrigir tela após o combinado 7
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          old = [
-              'file_00000000e634820e9997cef30dd9cb52.png?v=20260930-2',
-              'file_000000003d80820e9ff8a17638f02f00.png?v=20260930-1'
-          ]
-          new = 'detalhes.jpg?v=20261002'
-          changed = False
-          for value in old:
-              if value in s:
-                  s = s.replace(value, new)
-                  changed = True
-          if changed:
-              p.write_text(s, encoding='utf-8')
-          else:
-              print('Nenhuma referência quebrada encontrada.')
+
+          old = '<section id="details" class="view detailsView"><div class="detailsPaper"><img class="detailsImage" src="file_000000007f04820e9ff7fd2ea074c872.png?v=20261002-2" alt="Detalhes do chá de bebê"></div></section>'
+          new = '<section id="details" class="view detailsView"><div class="detailsPaper"><div><img class="detailsImage" src="file_000000007f04820e9ff7fd2ea074c872.png?v=20261002-3" alt="Detalhes do chá de bebê"><p style="text-align:center;margin:16px 0 28px"><button class="btn" onclick="show(\'gifts\')">🎁 VER LISTA DE PRESENTES</button></p></div></div></section>'
+
+          if old not in s:
+              raise SystemExit('Trecho esperado da tela de detalhes não encontrado.')
+
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
           PY
       - name: Commit fix
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Corrige imagem da tela de detalhes'
+          git diff --cached --quiet || git commit -m 'Corrige tela após o combinado 7'
           git push
