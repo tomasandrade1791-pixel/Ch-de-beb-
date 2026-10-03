@@ -25,15 +25,14 @@ jobs:
 
           old_details = '<button class="btn" onclick="show(\'gifts\')">🎁 VER LISTA DE PRESENTES</button>'
           new_details = '<button class="btn" onclick="show(\'name\')">🎁 VER LISTA DE PRESENTES</button>'
-          if old_details not in s:
-              raise SystemExit('Botão da tela de detalhes não encontrado; nenhuma alteração feita.')
-          s = s.replace(old_details, new_details, 1)
+          if old_details in s:
+              s = s.replace(old_details, new_details, 1)
 
-          old_no = "':'<p>Obrigado por nos avisar. Mesmo de longe, seu carinho estará presente conosco.</p>'"
-          new_no = "':'<p>Obrigado por nos avisar. Mesmo de longe, seu carinho estará presente conosco.</p><p>Entendemos e agradecemos por nos avisar. Esperamos poder celebrar outro momento com você. 🤍</p><p style=\"text-align:center\"><button class=\"btn\" onclick=\"show(\\'gifts\\')\">CONTINUAR →</button></p>'"
-          if old_no not in s:
-              raise SystemExit('Mensagem de não confirmação não encontrada; nenhuma alteração feita.')
-          s = s.replace(old_no, new_no, 1)
+          old_respond = "function respond(ok){document.getElementById('rt').textContent=ok?'Oi! Eu sou a Alice! 💕⭐':'🤍 Sentiremos sua falta!';document.getElementById('rx').innerHTML=ok?'<p>Muito obrigada por confirmar sua presença no meu chá de bebê! 🥹🍼</p><p>Mamãe e papai estão preparando tudo com muito carinho para esse dia, e saber que você estará lá para celebrar a minha chegada deixa esse momento ainda mais especial.</p><p>Mal posso esperar para te conhecer! 💙⭐</p><p>Nos vemos no meu chá!<br>Com carinho,<br>Alice 🍼⭐</p><p style=\"text-align:center\"><button class=\"btn\" onclick=\"show(\\'gifts\\')\">CONTINUAR →</button></p>':'<p>Obrigado por nos avisar. Mesmo de longe, seu carinho estará presente conosco.</p><p>Entendemos e agradecemos por nos avisar. Esperamos poder celebrar outro momento com você. 🤍</p><p style=\"text-align:center\"><button class=\"btn\" onclick=\"show(\\'gifts\\')\">CONTINUAR →</button></p>';show('response')}"
+          new_respond = "function respond(ok){document.getElementById('rt').textContent='Oi! Eu sou a Alice! 💕⭐';document.getElementById('rx').innerHTML=ok?'<p>Muito obrigada por confirmar sua presença no meu chá de bebê! 🥹🍼</p><p>Mamãe e papai estão preparando tudo com muito carinho para esse dia, e saber que você estará lá para celebrar a minha chegada deixa esse momento ainda mais especial.</p><p>Mal posso esperar para te conhecer! 💙⭐</p><p>Nos vemos no meu chá!<br>Com carinho,<br>Alice 🍼⭐</p><p style=\"text-align:center\"><button class=\"btn\" onclick=\"show(\\'gifts\\')\">CONTINUAR →</button></p>':'<p>Tudo bem se você não conseguir estar presente no meu chá de bebê. Eu sei que às vezes surgem compromissos e nem sempre conseguimos estar presentes em todos os momentos especiais. 🥹💙</p><p>Mesmo de longe, seu carinho pela minha chegada já significa muito para a minha família. ⭐</p><p>E se você quiser deixar um presentinho para mim mesmo não podendo comparecer, será recebido com muito carinho. 🍼🎁</p><p>Você pode enviar, se desejar, um presente pela nossa lista ou através do Pix abaixo:</p><p style=\"text-align:center;font-size:20px\"><strong>47999037360</strong></p><p>Essa contribuição é totalmente opcional. O mais importante é saber que você torce pela minha chegada! 💙⭐</p><p>Com carinho,<br>Alice 🍼⭐</p><p style=\"text-align:center\"><button class=\"btn\" onclick=\"show(\\'gifts\\')\">CONTINUAR →</button></p>';show('response')}"
+          if old_respond not in s:
+              raise SystemExit('Função de confirmação não encontrada; nenhuma alteração feita.')
+          s = s.replace(old_respond, new_respond, 1)
 
           p.write_text(s, encoding='utf-8')
           PY
