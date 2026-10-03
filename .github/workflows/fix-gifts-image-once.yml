@@ -1,0 +1,41 @@
+name: Corrigir imagem da escolha de presentes
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'Corrige imagem da escolha de presentes'
+    steps:
+      - name: Baixar o estado atual
+        uses: actions/checkout@v4
+
+      - name: Trocar somente a imagem da escolha de presentes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "https://raw.githubusercontent.com/tomasandrade1791-pixel/Ch-de-beb-/main/detalhes.jpg?v=20261002"
+          new = "file_000000003d80820e9ff8a17638f02f00.png?v=20261002"
+          if old not in s:
+              raise SystemExit('Alvo não encontrado; nenhuma alteração foi feita.')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Gravar a correção e remover este arquivo temporário
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/fix-gifts-image-once.yml
+          git add index.html .github/workflows/fix-gifts-image-once.yml
+          git diff --cached --check
+          git commit -m "Corrige imagem da escolha de presentes"
+          git push origin main
