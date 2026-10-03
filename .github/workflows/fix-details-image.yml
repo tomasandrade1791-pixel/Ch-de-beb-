@@ -14,14 +14,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fix only the details image reference
+      - name: Fix only the details image references
         shell: python
         run: |
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          old = 'file_000000007f04820e9ff7fd2ea074c872.png?v=20261002-3'
-          new = 'detalhes-cha-bebe.png?v=20261002'
+          old = 'file_000000007f04820e9ff7fd2ea074c872.png'
+          new = 'detalhes-cha-bebe.png'
+          changed = False
+
           marker = '<section id="details"'
           start = s.find(marker)
           if start == -1:
@@ -33,9 +35,19 @@ jobs:
           if old in section:
               section = section.replace(old, new)
               s = s[:start] + section + s[end:]
+              changed = True
+
+          # The show('details') handler also rewrites the image source at runtime.
+          runtime_old = "img.src='" + old
+          runtime_new = "img.src='" + new
+          if runtime_old in s:
+              s = s.replace(runtime_old, runtime_new)
+              changed = True
+
+          if changed:
               p.write_text(s, encoding='utf-8')
           else:
-              print('Details image already fixed or reference not found; no change needed.')
+              print('Details image references already fixed; no change needed.')
 
       - name: Commit fix if needed
         shell: bash
@@ -47,5 +59,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Fix details image in invitation'
+          git commit -m 'Fix details image runtime reference'
           git push
