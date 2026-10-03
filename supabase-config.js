@@ -329,3 +329,27 @@ window.AliceDB = null;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeInvitationBottomGap);else removeInvitationBottomGap();
 })();
+
+/* CORREÇÃO DO FLUXO DE NÃO CONFIRMAÇÃO.
+   Quem não poderá comparecer vê somente o recado e não recebe o botão de continuar.
+   O fluxo de confirmação permanece com o botão para seguir ao cantinho da Alice. */
+(function(){
+  function fixNoConfirmation(){
+    const response=document.getElementById('response');
+    if(!response)return;
+    const title=document.getElementById('rt');
+    const isNoConfirmation=title && /não|nao|não poderei|nao poderei|não poderei comparecer|nao poderei comparecer/i.test(title.textContent||'');
+    if(!isNoConfirmation)return;
+    response.querySelectorAll('button').forEach(function(btn){
+      if(/CONTINUAR/i.test(btn.textContent||''))btn.remove();
+    });
+  }
+  function bootNoConfirmationFix(){
+    const response=document.getElementById('response');
+    if(!response)return;
+    const observer=new MutationObserver(function(){fixNoConfirmation();});
+    observer.observe(response,{childList:true,subtree:true,characterData:true});
+    fixNoConfirmation();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootNoConfirmationFix);else bootNoConfirmationFix();
+})();
