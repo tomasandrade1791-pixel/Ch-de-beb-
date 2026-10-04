@@ -1,4 +1,4 @@
--- CORREÇÃO DAS PERMISSÕES DO EVENTO E DAS CONFIRMAÇÕES
+-- CORREÇÃO DAS PERMISSÕES DO EVENTO, CONFIRMAÇÕES E LISTA DE PRESENTES
 -- Não apaga nem altera nenhum dado existente.
 
 -- EVENTO
@@ -42,3 +42,45 @@ to anon, authenticated
 with check (true);
 
 grant insert on table public.confirmacoes_alice to anon, authenticated;
+
+-- LISTA DE PRESENTES
+-- Os convidados precisam conseguir consultar os limites definidos
+-- pelos papais e os itens disponíveis sem fazer login.
+alter table public.limites_presentes_alice enable row level security;
+
+drop policy if exists "Public can read limites_presentes_alice" on public.limites_presentes_alice;
+
+create policy "Public can read limites_presentes_alice"
+on public.limites_presentes_alice
+for select
+to anon, authenticated
+using (true);
+
+grant select on table public.limites_presentes_alice to anon, authenticated;
+
+-- Registros dos presentes escolhidos também precisam ser consultáveis
+-- para que a página consiga mostrar quantas pessoas já escolheram cada item.
+alter table public.presentes_alice enable row level security;
+
+drop policy if exists "Public can read presentes_alice" on public.presentes_alice;
+
+create policy "Public can read presentes_alice"
+on public.presentes_alice
+for select
+to anon, authenticated
+using (true);
+
+grant select on table public.presentes_alice to anon, authenticated;
+
+-- O convidado também poderá registrar a escolha do presente.
+drop policy if exists "Public can insert presentes_alice" on public.presentes_alice;
+
+create policy "Public can insert presentes_alice"
+on public.presentes_alice
+for insert
+to anon, authenticated
+with check (true);
+
+grant insert on table public.presentes_alice to anon, authenticated;
+
+notify pgrst, 'reload schema';
