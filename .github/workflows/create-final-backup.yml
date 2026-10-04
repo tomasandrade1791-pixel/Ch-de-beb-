@@ -1,0 +1,21 @@
+name: Create final baby shower backup
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'backup-final-cha-de-bebe-finalizado.html'
+permissions:
+  contents: write
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create immutable final backup copy
+        run: |
+          cp index.html backup-final-cha-de-bebe-finalizado.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backup-final-cha-de-bebe-finalizado.html
+          git commit -m 'Backup final - Cha de Bebe Finalizado 1.0'
+          git push
