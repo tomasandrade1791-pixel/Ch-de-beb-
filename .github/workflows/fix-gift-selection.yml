@@ -1,0 +1,49 @@
+name: Ajustar lista de presentes
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Exigir escolha de presente antes de continuar
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          old_button = '''<p style="text-align:center"><button class="btn" onclick="show('response')">‹ VOLTAR</button> <button class="btn" onclick="show('thankyou')">CONTINUAR →</button></p>'''
+          new_button = '''<p style="text-align:center"><button class="btn" onclick="show('response')">‹ VOLTAR</button> <button id="giftContinueBtn" class="btn" disabled onclick="continueFromGifts()">CONTINUAR →</button></p>'''
+          if old_button in s:
+              s = s.replace(old_button, new_button, 1)
+
+          old_func = '''function renderGifts(){const gl=document.getElementById('gl');if(!gl)return;gl.innerHTML=giftData.map(cat=>'<div class="category open"><button class="catHead" onclick="this.parentElement.classList.toggle(\\'open\\');this.querySelector(\\'.catIcon\\').textContent=this.parentElement.classList.contains(\\'open\\')?\\'−\\':\\'+\\'"><span>'+cat[0]+'</span><span class="catIcon">−</span></button><div class="catBody">'+cat[1].map(item=>'<label class="gift"><input type="checkbox"><span class="giftName">'+item+'</span></label>').join('')+'</div></div>').join('');window.scrollTo(0,0)}'''
+          new_func = '''function updateGiftContinue(){const btn=document.getElementById('giftContinueBtn');if(!btn)return;btn.disabled=!document.querySelector('#gl input[type="checkbox"]:checked')}\nfunction continueFromGifts(){if(!document.querySelector('#gl input[type="checkbox"]:checked')){alert('Escolha pelo menos um presente para continuar. 💙');return}show('thankyou')}\nfunction renderGifts(){const gl=document.getElementById('gl');if(!gl)return;gl.innerHTML=giftData.map(cat=>'<div class="category open"><button class="catHead" onclick="this.parentElement.classList.toggle(\\'open\\');this.querySelector(\\'.catIcon\\').textContent=this.parentElement.classList.contains(\\'open\\')?\\'−\\':\\'+\\'"><span>'+cat[0]+'</span><span class="catIcon">−</span></button><div class="catBody">'+cat[1].map(item=>'<label class="gift"><input type="checkbox" onchange="updateGiftContinue()"><span class="giftName">'+item+'</span></label>').join('')+'</div></div>').join('');updateGiftContinue();window.scrollTo(0,0)}'''
+          if old_func in s:
+              s = s.replace(old_func, new_func, 1)
+          else:
+              raise SystemExit('Função renderGifts não encontrada; nenhuma alteração feita.')
+
+          p.write_text(s, encoding='utf-8')
+
+      - name: Publicar alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração necessária."
+          else
+            git commit -m "Exigir presente escolhido antes de continuar"
+            git push
+          fi
